@@ -30,6 +30,9 @@ android {
 }
 
 dependencies {
+    //import Google Authentication
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+
     // define a BOM and its version
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
 
