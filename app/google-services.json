@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "753065242240",
+    "project_id": "sound-friends",
+    "storage_bucket": "sound-friends.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753065242240:android:e7f9d38aecd24627804065",
+        "android_client_info": {
+          "package_name": "com.example.soundfriends"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPKtykBz1sIosok9yUT3qRCphlUIwZIQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
