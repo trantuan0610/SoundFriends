@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:ems="10"
-                android:hint="Nhập Email ..."
+                android:hint="Email ..."
                 android:inputType="textEmailAddress"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="26dp"
                 android:ems="10"
-                android:hint="Nhập Mật khẩu ..."
+                android:hint="Mật khẩu ..."
                 android:inputType="textPassword"
                 app:layout_constraintEnd_toEndOf="@+id/edtRegisterEmail"
                 app:layout_constraintHorizontal_bias="0.4"
@@ -84,6 +84,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:orientation="horizontal"
+                android:layout_marginTop="36dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/edtRegisterPassword2"
                 app:layout_constraintStart_toStartOf="@+id/edtRegisterPassword2"
