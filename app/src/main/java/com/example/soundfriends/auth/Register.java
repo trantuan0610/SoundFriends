@@ -85,6 +85,8 @@ public class Register extends AppCompatActivity {
                     return;
                 }
 
+                //test commit
+
                 //set loading state
                 pbLoadRegister.setVisibility(View.VISIBLE);
 
