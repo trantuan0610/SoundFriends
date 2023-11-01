@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +20,7 @@
             android:layout_weight="1"
             android:background="@color/primary_pink"
             android:completionThreshold="1"
-            android:hint="Tìm trên SoundFriends"
+            android:hint="Tìm trên SoundFriends ..."
             android:maxLines="1"
             android:paddingLeft="26dp" />
 
@@ -30,28 +29,13 @@
             android:layout_width="match_parent"
             android:layout_height="69dp"
             android:layout_weight="5"
+            android:contentDescription="Voice Search"
             android:background="@color/primary_pink"
             app:srcCompat="@drawable/round_mic_24" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Trang chủ"
-        android:layout_centerInParent="true"
-        android:layout_below="@id/header"/>
-
-    <Button
-        android:id="@+id/logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Đăng xuất"
-        android:layout_below="@id/textView"/>
-
-    <androidx.viewpager.widget.ViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
