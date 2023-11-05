@@ -10,18 +10,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -29,15 +25,14 @@ import com.example.soundfriends.R;
 import com.example.soundfriends.Song;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.annotations.Nullable;
+import android.util.Base64;
+import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myViewHolder> {
-//    ImageView imageView;
 
     /**
      * Initialize a {@link RecyclerView.Adapter} that listens to a Firebase query. See
@@ -50,61 +45,62 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
     private Context context;
     public UploadSongs(@NonNull FirebaseRecyclerOptions<Songs> options) {
         super(options);
-        Log.d("huhu", "UploadSongs: " + getItemCount());
 
     }
 
     @Override
     protected void onBindViewHolder(@NonNull myViewHolder holder, int position, @NonNull Songs model) {
-        holder.title.setText(model.getTitle());
-        holder.artist.setText(model.getArtist());
-        holder.category.setText(model.getCategory());
-//        holder.id.setText(model.getId());
-//        Glide.with(holder.imageView.getContext())
-//                .asBitmap()
-//                .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
-//                .circleCrop()
-//                .load(model.getSrl())
-//                .into(new CustomTarget<Bitmap>() {
-//                    @Override
-//                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-//                        holder.imageView.setImageBitmap(resource);
-//                        Log.d("kaka", "onResourceReady: "+ resource);
-//                    }
-//
-//                    @Override
-//                    public void onLoadCleared(@Nullable Drawable placeholder) {
-//                        // Đây là phương thức được gọi khi imageView được xóa do cuộc gọi vòng đời hoặc vì một số lý do khác.
-//                        // Nếu bạn đang tham chiếu bitmap ở nơi khác ngoài imageView này
-//                        // hãy xóa nó ở đây vì bạn không thể sử dụng bitmap nữa
-//                    }
-//                });
-        String imageUrl = model.getUrlImg(); // Đường dẫn URL của hình ảnh
-
-        try {
-            URL url = new URL(imageUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap bitmap = BitmapFactory.decodeStream(input);
-
-            // Thiết lập hình ảnh vào ImageView
-            holder.imageView.setImageBitmap(bitmap);
-
-            // Đóng kết nối và input stream
-            input.close();
-            connection.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Xử lý lỗi tải hình ảnh
-        }
-
-
-
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String userIDLogin = currentUser.getUid();
 
         onClickHolder(holder, model);
 
+        if (model.getUserID().equals(userIDLogin)) {
+            holder.title.setText(model.getTitle());
+            holder.artist.setText(model.getArtist());
+            holder.category.setText(model.getCategory());
+
+            // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap)
+            String base64Image = model.getUrlImg();
+            // Chuyển đổi chuỗi bitmap thành mảng byte
+            byte[] imageBytes = Base64.decode(base64Image, Base64.DEFAULT);
+
+            // Kiểm tra xem mảng byte có hợp lệ không
+            if (imageBytes == null || imageBytes.length == 0) {
+                Toast.makeText(holder.imageView.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Chuyển đổi mảng byte thành bitmap
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+            // Kiểm tra xem bitmap có hợp lệ không
+            if (bitmap == null) {
+                Toast.makeText(holder.imageView.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Bitmap đã tải xong, hiển thị nó bằng Glide
+            Glide.with(holder.imageView.getContext())
+                    .as(Bitmap.class)
+                    .load(bitmap)
+                    .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
+                    .error(com.google.firebase.database.ktx.R.drawable.common_google_signin_btn_icon_dark_normal)
+                    .circleCrop()
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            holder.imageView.setImageBitmap(resource);
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                            // Xử lý khi tải bị xóa (nếu cần)
+                        }
+                    });
+        } else {
+            holder.itemView.setVisibility(View.GONE);
+        }
     }
 
 
@@ -134,7 +130,6 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
             category = (TextView) itemView.findViewById(R.id.tv_category);
             imgbtn = (ImageButton) itemView.findViewById(R.id.imgbtn);
             tvsrl = (TextView) itemView.findViewById(R.id.tvsrl);
-            mediaPlayer = new MediaPlayer();
 
 
         }

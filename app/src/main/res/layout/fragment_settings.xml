@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.SettingsFragment">
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ScrollView
+        android:layout_height="wrap_content"
+        android:id="@+id/scrView">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/scrView">
+            android:layout_height="match_parent">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -32,8 +32,6 @@
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"/>
 
-
-
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/settingsAvatar"
                     android:layout_width="50dp"
@@ -42,158 +40,139 @@
                     android:src="@drawable/bgregister"
                     app:shapeAppearanceOverlay="@style/circleImageStyle"/>
             </LinearLayout>
-        </ScrollView>
-        <Button
-            android:id="@+id/bt_upload"
-            android:layout_marginTop="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tải nhạc lên"
-            android:textSize="20sp"
-            android:textColor="@color/black"
-            android:layout_below="@+id/scrView"
-            android:layout_centerHorizontal="true"
-            android:background="@color/primary_pink"/>
-
-        <ProgressBar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:id="@+id/progressbar"
-            android:layout_below="@id/bt_upload"
-            android:layout_marginTop="10dp"
-            >
-
-        </ProgressBar>
-
-
-        <TextView
-            android:id="@+id/tv_uploaded_song"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:textColor="@color/black"
-            android:text="Nhạc đã tải"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_below="@id/rl_layout"
-            />
-
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:padding="15dp"
-            android:id="@+id/rl_layout"
-            android:layout_below="@+id/progressbar">
-
-            <ImageView
-                android:id="@+id/img1"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@drawable/logo" />
-
-            <LinearLayout
-                android:id="@+id/ln_layout"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/bt_upload"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/img1"
-                android:orientation="vertical">
+                android:text="Tải nhạc lên"
+                android:textColor="@color/black"
+                android:layout_below="@+id/linearHeaderSettings"
+                android:backgroundTint="@android:color/transparent"
+                android:textAlignment="textStart"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:padding="20dp" />
 
-                <TextView
-                    android:id="@+id/tvSong"
-                    android:layout_width="240dp"
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:id="@+id/progressbar"
+                android:layout_below="@id/bt_upload"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"
+                >
+            </ProgressBar>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:padding="15dp"
+                android:id="@+id/rl_layout"
+                android:visibility="gone"
+                android:layout_below="@+id/progressbar">
+
+                <ImageView
+                    android:id="@+id/img1"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/logo" />
+
+                <LinearLayout
+                    android:id="@+id/ln_layout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:contentDescription="#000"
-                    android:text="Song Name"
-                    android:textColor="@color/black"
-                    android:textSize="25sp"
-                    android:textStyle="bold" />
+                    android:layout_toRightOf="@+id/img1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvArtist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvSong"
-                    android:layout_marginLeft="10dp"
-                    android:contentDescription="#000"
-                    android:text="artist"
-                    android:textColor="@color/black"
-                    android:textSize="20sp" />
+                    <TextView
+                        android:id="@+id/tvSong"
+                        android:layout_width="240dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:contentDescription="#000"
+                        android:text="Tên bài hát"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tvCategory"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvArtist"
-                    android:layout_marginLeft="10dp"
-                    android:contentDescription="#000"
-                    android:text="Category"
-                    android:textColor="@color/black"
-                    android:textSize="20sp" />
+                    <TextView
+                        android:id="@+id/tvArtist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvSong"
+                        android:layout_marginLeft="10dp"
+                        android:contentDescription="#000"
+                        android:text="Nghệ sĩ"
+                        android:textColor="@color/black"
+                        android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/tvsrl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvCategory"
-                    android:layout_marginLeft="10dp"
-                    android:contentDescription="#000"
-                    android:text="No file Selected"
-                    android:textColor="@color/black"
-                    android:textSize="20sp" />
+                    <TextView
+                        android:id="@+id/tvCategory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvArtist"
+                        android:layout_marginLeft="10dp"
+                        android:contentDescription="#000"
+                        android:text="Thể loại"
+                        android:textColor="@color/black"/>
 
+                    <TextView
+                        android:id="@+id/tvsrl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvCategory"
+                        android:layout_marginLeft="10dp"
+                        android:contentDescription="#000"
+                        android:text="Chưa chọn file audio"
+                        android:textColor="@color/black" />
+                </LinearLayout>
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/buttonUplaod"
                     android:layout_marginTop="10dp"
-                    android:text="upload"
+                    android:text="Bắt đầu tải lên"
                     android:textStyle="bold"
-                    android:layout_below="@+id/tvsrl"
+                    android:layout_below="@+id/ln_layout"
                     ></Button>
+            </RelativeLayout>
 
-
-
-
-            </LinearLayout>
-
-
-
-
-            <ImageButton
-                android:id="@+id/imgbtn"
-                android:layout_width="13dp"
+            <TextView
+                android:id="@+id/tv_uploaded_song"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_toEndOf="@+id/ln_layout"
-                android:layout_toRightOf="@id/ln_layout"
-                android:layout_centerVertical="true"
-                android:background="@null"
-                android:src="@drawable/overflow_menu"></ImageButton>
+                android:padding="20dp"
+                android:textColor="@color/black"
+                android:text="Nhạc đã tải lên"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:layout_below="@id/rl_layout"
+                />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvlist_song_uploaded"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_uploaded_song"
+                android:layout_marginTop="1dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:layout_marginBottom="68dp"
+                android:textSize="20sp"
+                />
         </RelativeLayout>
+    </ScrollView>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvlist_song_uploaded"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_below="@+id/tv_uploaded_song"
-            android:layout_marginTop="1dp"
-            android:paddingLeft="20dp"
-            android:textSize="20sp"
-            />
-        <Button
-            android:id="@+id/logout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Đăng xuất"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="20dp"
-            />
-    </RelativeLayout>
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="20dp"
+        android:text="Đăng xuất" />
 </FrameLayout>
