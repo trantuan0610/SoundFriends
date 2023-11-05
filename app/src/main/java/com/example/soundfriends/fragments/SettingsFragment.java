@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.OpenableColumns;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,13 +44,19 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 
 
 /**
@@ -147,6 +154,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
+
         if(user == null) {
             goAuthActivity();
         }else {
@@ -165,13 +173,23 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             }
         });
 
-        FirebaseRecyclerOptions<Songs> options =
-                new FirebaseRecyclerOptions.Builder<Songs>()
-                        .setQuery(FirebaseDatabase.getInstance().getReference().child("songs"), Songs.class)
-                        .build();
+        //Nếu UserID lưu trong songs trùng với UserIDLogin thì hiện danh sách bài hát mà 2 user đấy trùng nhau
+        FirebaseUser userIDLogin = FirebaseAuth.getInstance().getCurrentUser();
+        String userIDLoginString = userIDLogin.getUid(); // Lấy UID của người dùng hiện tại
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference songsRef = database.getReference("songs");
+
+        Query query = songsRef.orderByChild("userID").equalTo(userIDLoginString);
+
+        FirebaseRecyclerOptions<Songs> options = new FirebaseRecyclerOptions.Builder<Songs>()
+                .setQuery(query, Songs.class)
+                .build();
 
         uploadSongs = new UploadSongs(options);
         rcvlist_song_uploaded.setAdapter(uploadSongs);
+
+
 
         metadataRetriever = new MediaMetadataRetriever();
         referenceSongs = FirebaseDatabase.getInstance().getReference().child("songs");
@@ -179,6 +197,8 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
         buttonUpload = view.findViewById(R.id.buttonUplaod);
         btnUpload = view.findViewById(R.id.bt_upload);
+
+
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -192,6 +212,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                 uploadFileTofirebase(view);
             }
         });
+
 
         return view;
     }
@@ -337,8 +358,13 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                     storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+                            String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
                             Log.d(TAG, "onSuccess: " + art);
-                            Songs uploadSong = new Songs(title1, artist1, category1, bitmap.toString(),uri.toString(), userID);
+                            Songs uploadSong = new Songs(title1, artist1, category1, base64Image,uri.toString(), userID);
                             String uploadId = referenceSongs.push().getKey();
                             referenceSongs.child(uploadId).setValue(uploadSong);
 
