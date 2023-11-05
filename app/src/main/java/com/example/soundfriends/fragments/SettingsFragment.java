@@ -164,8 +164,11 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             userID = user.getUid();
             String info = user.getEmail() != null ? user.getEmail() : user.getDisplayName();
             textView.setText("Xin chào " + info);
-            String url = user.getPhotoUrl().toString();
-            Glide.with(this).load(Uri.parse(url)).into(settingsAvatar);
+
+            if(user.getPhotoUrl() != null) {
+                String url = user.getPhotoUrl().toString();
+                Glide.with(this).load(Uri.parse(url)).into(settingsAvatar);
+            }
 
         }
         btnLogout.setOnClickListener(new View.OnClickListener() {
