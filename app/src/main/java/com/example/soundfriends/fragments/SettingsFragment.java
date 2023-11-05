@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.soundfriends.MainActivity;
 import com.example.soundfriends.R;
+import com.example.soundfriends.Song;
 import com.example.soundfriends.auth.Login;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.fragments.Model.UploadSongs;
@@ -55,6 +56,8 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.util.UUID;
 
 import java.io.ByteArrayOutputStream;
 
@@ -161,8 +164,11 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             userID = user.getUid();
             String info = user.getEmail() != null ? user.getEmail() : user.getDisplayName();
             textView.setText("Xin chào " + info);
-            String url = user.getPhotoUrl().toString();
-            Glide.with(this).load(Uri.parse(url)).into(settingsAvatar);
+
+            if(user.getPhotoUrl() != null) {
+                String url = user.getPhotoUrl().toString();
+                Glide.with(this).load(Uri.parse(url)).into(settingsAvatar);
+            }
 
         }
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +242,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.d("SELECTED", String.valueOf(i));
+
     }
 
     @Override
@@ -362,7 +368,9 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                             String base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
 
                             Log.d(TAG, "onSuccess: " + art);
-                            Songs uploadSong = new Songs(title1, artist1, category1, base64Image,uri.toString(), userID);
+
+                            String songId = createTransactionID();
+                            Songs uploadSong = new Songs(songId, title1, artist1, category1, base64Image,uri.toString(), userID);
                             String uploadId = referenceSongs.push().getKey();
                             referenceSongs.child(uploadId).setValue(uploadSong);
 
@@ -395,9 +403,16 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
 
         return  mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(audioUri));
+
     }
+
 
     public class YourFragment extends Fragment {
         // ... Các phần khác của mã của Fragment ...
+    }
+
+
+    public String createTransactionID(){
+        return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
 }

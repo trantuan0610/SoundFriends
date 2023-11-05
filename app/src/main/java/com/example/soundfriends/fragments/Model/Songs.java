@@ -4,18 +4,19 @@ import android.graphics.Bitmap;
 
 public class Songs {
 
-        public  String title, artist, category, urlImg, srl, userID;
+        public  String id, title, artist, category, urlImg, srl, userID;
 
         public Songs() {
         }
 
-        public Songs(String title, String artist, String category, String urlImg, String srl, String userID) {
+        public Songs(String id, String title, String artist, String category, String urlImg, String srl, String userID) {
 
 
             if(title.trim().equals("")){
                 title = "No title";
             }
 
+            this.id = id;
             this.title = title;
             this.category = category;
             this.artist = artist;
@@ -33,6 +34,7 @@ public class Songs {
         this.title = title;
     }
 
+    public String getId() {return id;}
     public String getArtist() {
             return artist;
         }
