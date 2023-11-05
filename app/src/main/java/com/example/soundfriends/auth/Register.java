@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.soundfriends.MainActivity;
 import com.example.soundfriends.R;
+import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.example.soundfriends.utils.validator;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -101,7 +102,7 @@ public class Register extends AppCompatActivity {
                 }
 
                 //set loading state
-                sharedAuthMethods.setLoading(true, pbLoadRegister);
+                ToggleShowHideUI.toggleShowUI(true, pbLoadRegister);
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -123,7 +124,7 @@ public class Register extends AppCompatActivity {
                                             Toast.LENGTH_LONG).show();
                                 }
                                 //hide loading state
-                                sharedAuthMethods.setLoading(false,pbLoadRegister);
+                                ToggleShowHideUI.toggleShowUI(false,pbLoadRegister);
                             }
                         });
             }

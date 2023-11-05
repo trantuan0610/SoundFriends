@@ -3,7 +3,7 @@
     <string name="client_id">753065242240-uiloihvj2v6c6qid8vgmu32ttpdhnc0u.apps.googleusercontent.com</string>
     <string name="menu_home_title">Trang chủ</string>
     <string name="menu_search_title">Tìm kiếm</string>
-    <string name="menu_settings_title">Cài đặt</string>
+    <string name="menu_settings_title">Quản lý</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

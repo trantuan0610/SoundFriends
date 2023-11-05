@@ -28,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ import com.example.soundfriends.R;
 import com.example.soundfriends.auth.Login;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.fragments.Model.UploadSongs;
+import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,6 +61,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
     TextView textViewImage;
     ProgressBar progressBar;
+    RelativeLayout rlUploadingSong;
     Uri audioUri ;
     StorageReference mStorageref;
     StorageTask mUploadsTask ;
@@ -115,9 +118,6 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-
-
     }
 
     @Override
@@ -133,6 +133,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
         textViewImage = view.findViewById(R.id.tvsrl);
         progressBar = view.findViewById(R.id.progressbar);
+        rlUploadingSong = view.findViewById(R.id.rl_layout);
         title = view.findViewById(R.id.tvSong);
         artist = view.findViewById(R.id.tvArtist);
         category = view.findViewById(R.id.tvCategory);
@@ -146,21 +147,14 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
-        Log.d(TAG, "onActivityResult:" + auth);
-        // Lấy ID của người đăng nhập
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            userID = currentUser.getUid();
-        }
-
-
         if(user == null) {
             goAuthActivity();
         }else {
+            userID = user.getUid();
             String info = user.getEmail() != null ? user.getEmail() : user.getDisplayName();
             textView.setText("Xin chào " + info);
-//            String url = user.getPhotoUrl().toString();
-//            Glide.with(this).load(Uri.parse(url)).into(settingsAvatar);
+            String url = user.getPhotoUrl().toString();
+            Glide.with(this).load(Uri.parse(url)).into(settingsAvatar);
 
         }
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -238,8 +232,6 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
     }
 
-
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -275,9 +267,11 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             }else {
                 Log.d(TAG, "onActivityResult: null");
             }
+            ToggleShowHideUI.toggleShowUI(true, rlUploadingSong);
         }
         else {
             Log.d(TAG, "onActivityResult: NOt OK");
+            ToggleShowHideUI.toggleShowUI(false, rlUploadingSong);
         }
 
 
@@ -317,14 +311,14 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
     public  void  uploadFileTofirebase (View v ){
         if(textViewImage.equals("No file Selected")){
             Toast.makeText(getContext(), "Please select an image!", Toast.LENGTH_SHORT).show();
-
         }
         else{
             if(mUploadsTask != null && mUploadsTask.isInProgress()){
-                Toast.makeText(getContext(), "songs uploads in allready progress!", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(getContext(), "songs uploads in already progress!", Toast.LENGTH_SHORT).show();
+                ToggleShowHideUI.toggleShowUI(true, progressBar);
             }else {
                 uploadFiles();
+                ToggleShowHideUI.toggleShowUI(true, progressBar);
             }
         }
 
@@ -346,7 +340,13 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                             Log.d(TAG, "onSuccess: " + art);
                             Songs uploadSong = new Songs(title1, artist1, category1, bitmap.toString(),uri.toString(), userID);
                             String uploadId = referenceSongs.push().getKey();
-                            referenceSongs.child(uploadId).setValue(uploadSong);                        }
+                            referenceSongs.child(uploadId).setValue(uploadSong);
+
+                            //change UI
+                            ToggleShowHideUI.toggleShowUI(false, progressBar);
+                            Toast.makeText(getContext(), "Tải lên thành công!", Toast.LENGTH_SHORT).show();
+                            ToggleShowHideUI.toggleShowUI(false, rlUploadingSong);
+                        }
                     });
 
                 }
@@ -363,24 +363,17 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         }else {
             Toast.makeText(getContext(), "No file Selected to uploads", Toast.LENGTH_SHORT).show();
         }
-
-
-
-
-
     }
 
     private  String getfileextension(Uri audioUri){
 
         ContentResolver contentResolver = getContext().getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+
         return  mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(audioUri));
-
     }
-
 
     public class YourFragment extends Fragment {
         // ... Các phần khác của mã của Fragment ...
     }
-
 }

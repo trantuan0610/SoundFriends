@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.soundfriends.MainActivity;
 import com.example.soundfriends.R;
+import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.example.soundfriends.utils.validator;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -32,7 +33,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class sharedAuthMethods extends AppCompatActivity {
     public void GoogleIntentLauncher(ActivityResult result, Context context, View pbLoading, FirebaseAuth firebaseAuth, GoogleSignInClient googleSignInClient) {
         if (result.getResultCode() == RESULT_OK){
-            setLoading(true, pbLoading);
+            ToggleShowHideUI.toggleShowUI(true, pbLoading);
             Intent intentData = result.getData();
             Task<GoogleSignInAccount> googleSignInAccountTask = GoogleSignIn.getSignedInAccountFromIntent(intentData);
             try {
@@ -82,17 +83,9 @@ public class sharedAuthMethods extends AppCompatActivity {
                         //remove Google logins account automatically
                         googleSignInClient.revokeAccess();
                         //set Load
-                        setLoading(false, pbLoading);
+                        ToggleShowHideUI.toggleShowUI(false, pbLoading);
                     }
                 });
-    }
-
-    public static void setLoading(boolean state, View pbLoad){
-        if (state) {
-            pbLoad.setVisibility(View.VISIBLE);
-        } else {
-            pbLoad.setVisibility(View.GONE);
-        }
     }
 
     public void goHomeActivity(Context context) {
