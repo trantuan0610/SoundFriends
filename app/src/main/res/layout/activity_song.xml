@@ -1,115 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:gravity="center_horizontal"
+    android:orientation="vertical"
     tools:context=".song">
 
     <TextView
+        android:id="@+id/txtMusicTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="Ta là của nhau"
         android:textAllCaps="true"
         android:textSize="18sp"
-        android:layout_marginTop="10dp"
-        android:textStyle="bold"
-        />
+        android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/txtartist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Đông Nhi - Ông Cao Thắng"
-        android:textSize="18sp"
         android:layout_marginTop="10dp"
-        />
+        android:text="Đông Nhi - Ông Cao Thắng"
+        android:textSize="18sp" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
         android:layout_marginTop="38dp"
-        >
+        app:cardCornerRadius="12dp">
+
         <ImageView
+            android:id="@+id/imgsong"
             android:layout_width="250dp"
             android:layout_height="250dp"
-            android:src="@drawable/img"
+            android:src="@drawable/img" />
 
-            />
     </androidx.cardview.widget.CardView>
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
+
         <ImageView
             android:id="@+id/like"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:src="@drawable/like"
             android:layout_marginTop="30dp"
-            />
+            android:src="@drawable/like" />
+
         <TextView
+            android:id="@+id/textlike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textlike"
             android:layout_marginTop="35dp"
             android:layout_toRightOf="@id/like"
-            android:text="123"
-            />
+            android:text="123" />
+
         <ImageView
             android:id="@+id/phonering"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:src="@drawable/phonering"
-            android:layout_marginTop="30dp"
             android:layout_marginLeft="60dp"
+            android:layout_marginTop="30dp"
             android:layout_toRightOf="@+id/like"
-            />
+            android:src="@drawable/phonering" />
+
         <ImageView
+            android:id="@+id/btnDownload"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:src="@drawable/download"
-            android:layout_marginTop="30dp"
             android:layout_marginLeft="60dp"
+            android:layout_marginTop="30dp"
             android:layout_toRightOf="@+id/phonering"
-            />
+            android:src="@drawable/download" />
 
     </RelativeLayout>
 
     <SeekBar
+        android:id="@+id/seekbar"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:progress="40"
+        android:progress="0"
 
         />
 
     <RelativeLayout
         android:layout_width="300dp"
         android:layout_height="wrap_content">
+
         <TextView
+            android:id="@+id/txtCurrentDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00"
 
-            />
+            android:text="00:00" />
+
         <TextView
+            android:id="@+id/txtDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:text="00:00"
-        />
+            android:text="00:00" />
     </RelativeLayout>
+
+    <!--    <Button-->
+    <!--        android:id="@+id/btnplay"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="Play" />-->
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:background="@color/white"
-        >
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/shuffle"
@@ -128,19 +136,19 @@
             android:textColor="@color/black" />
 
         <TextView
-            android:id="@+id/play_pause"
+            android:id="@+id/txtplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/previous"
             android:paddingLeft="25dp"
-            android:text="Play/Pause"
+            android:text="Play"
             android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/play_pause"
+            android:layout_toRightOf="@id/txtplay"
             android:background="@color/white"
             android:paddingLeft="25dp"
             android:text="Next"
@@ -163,13 +171,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginTop="25dp"
+        android:paddingLeft="18sp"
         android:text="Bình luận"
         android:textSize="18dp"
-        android:textStyle="bold"
-        android:layout_gravity="left"
-        android:paddingLeft="18sp"
-        android:layout_marginTop="25dp"
-        />
+        android:textStyle="bold" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -177,12 +184,12 @@
         android:layout_marginTop="20dp"
 
         >
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/avatar1"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/avtar1"
-            />
+            android:src="@drawable/avtar1" />
 
         <Button
             android:layout_width="250dp"
@@ -204,8 +211,8 @@
         android:layout_height="60dp"
         android:layout_gravity="bottom"
         android:layout_marginTop="20dp"
-        app:menu="@menu/menu_bottom_nav"
         android:background="@color/pink"
-        app:itemTextColor="@color/black"/>
+        app:itemTextColor="@color/black"
+        app:menu="@menu/menu_bottom_nav" />
 
 </LinearLayout>
