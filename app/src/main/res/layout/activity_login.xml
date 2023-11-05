@@ -20,15 +20,17 @@
           android:id="@+id/imageView"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:layout_marginTop="88dp"
           android:adjustViewBounds="true"
           android:scaleType="centerCrop"
           android:src="@drawable/bglogin"
           app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="1.0"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent" />
 
       <EditText
-          android:id="@+id/edtRegisterEmail"
+          android:id="@+id/edtLoginEmail"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_margin="20dp"
@@ -40,20 +42,20 @@
           app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
       <EditText
-          android:id="@+id/edtRegisterPassword"
+          android:id="@+id/edtLoginPassword"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_marginTop="26dp"
           android:ems="10"
           android:hint="Mật khẩu ..."
           android:inputType="textPassword"
-          app:layout_constraintEnd_toEndOf="@+id/edtRegisterEmail"
+          app:layout_constraintEnd_toEndOf="@+id/edtLoginEmail"
           app:layout_constraintHorizontal_bias="0.4"
-          app:layout_constraintStart_toStartOf="@+id/edtRegisterEmail"
-          app:layout_constraintTop_toBottomOf="@+id/edtRegisterEmail" />
+          app:layout_constraintStart_toStartOf="@+id/edtLoginEmail"
+          app:layout_constraintTop_toBottomOf="@+id/edtLoginEmail" />
 
       <Button
-          android:id="@+id/btnRegister"
+          android:id="@+id/btnLogin"
           android:layout_width="200dp"
           android:layout_height="60dp"
           android:text="Đăng nhập"
@@ -61,12 +63,12 @@
           android:textSize="18dp"
           android:textStyle="bold"
           android:layout_marginTop="26dp"
-          app:layout_constraintEnd_toEndOf="@+id/edtRegisterEmail"
-          app:layout_constraintStart_toStartOf="@+id/edtRegisterEmail"
-          app:layout_constraintTop_toBottomOf="@+id/edtRegisterPassword" />
+          app:layout_constraintEnd_toEndOf="@+id/edtLoginEmail"
+          app:layout_constraintStart_toStartOf="@+id/edtLoginEmail"
+          app:layout_constraintTop_toBottomOf="@+id/edtLoginPassword" />
 
       <ImageView
-          android:id="@+id/logInWithButton"
+          android:id="@+id/logInWithGoogle"
           android:layout_width="183dp"
           android:layout_height="26dp"
           android:src="@drawable/continue_with_google"
@@ -74,7 +76,17 @@
           app:layout_constraintBottom_toTopOf="@+id/linearLayout"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@+id/btnRegister" />
+          app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+
+      <ProgressBar
+          android:id="@+id/pbLoadLogin"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:visibility="gone"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="@+id/imageView" />
 
       <LinearLayout
           android:id="@+id/linearLayout"
@@ -87,7 +99,7 @@
           tools:layout_editor_absoluteX="20dp">
 
         <Button
-            android:id="@+id/btnLoginInRegister"
+            android:id="@+id/btnRegisterInLogin"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -102,7 +114,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Quân mật khẩu "
+            android:text="Quên mật khẩu "
             android:textAllCaps="false"
             android:textColor="@color/black" />
 

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="6dp"
+    android:elevation="6dp"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="15dp">
+
+        <ImageView
+            android:id="@+id/img2"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/logo" />
+
+        <LinearLayout
+            android:id="@+id/ln_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/img2"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_song"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:contentDescription="#000"
+                android:text="Song Name"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_artist"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_song"
+                android:layout_marginLeft="10dp"
+                android:contentDescription="#000"
+                android:text="artist"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tv_category"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_artist"
+                android:layout_marginLeft="10dp"
+                android:contentDescription="#000"
+                android:text="Category"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tv_srl"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_category"
+                android:layout_marginLeft="10dp"
+                android:contentDescription="#000"
+                android:text="No file Selected"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+
+        </LinearLayout>
+
+
+
+
+        <ImageButton
+            android:id="@+id/imgbtn"
+            android:layout_width="13dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/ln_layout"
+            android:layout_toRightOf="@id/ln_layout"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:src="@drawable/overflow_menu"></ImageButton>
+
+    </RelativeLayout>
+
+
+
+
+
+</androidx.cardview.widget.CardView>
