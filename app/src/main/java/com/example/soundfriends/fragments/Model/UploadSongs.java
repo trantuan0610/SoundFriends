@@ -1,5 +1,11 @@
 package com.example.soundfriends.fragments.Model;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import static java.security.AccessController.getContext;
+
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -20,10 +26,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.soundfriends.R;
+import com.example.soundfriends.Song;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.annotations.Nullable;
-import com.google.firebase.database.core.Context;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +45,9 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
      *
      * @param options
      */
+
+
+    private Context context;
     public UploadSongs(@NonNull FirebaseRecyclerOptions<Songs> options) {
         super(options);
         Log.d("huhu", "UploadSongs: " + getItemCount());
@@ -50,7 +59,7 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
         holder.title.setText(model.getTitle());
         holder.artist.setText(model.getArtist());
         holder.category.setText(model.getCategory());
-
+//        holder.id.setText(model.getId());
 //        Glide.with(holder.imageView.getContext())
 //                .asBitmap()
 //                .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
@@ -94,6 +103,7 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
 
 
 
+        onClickHolder(holder, model);
 
     }
 
@@ -103,6 +113,7 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
     @NonNull
     @Override
     public myViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_songs, parent, false);
         return new myViewHolder(view);
     }
@@ -129,6 +140,26 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
         }
 
 
+    }
+
+    private void onClickHolder(myViewHolder holder, Songs model) {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Create an Intent to open the target Activity
+                Intent intent = new Intent(context, Song.class);
+
+                // Pass any necessary data to the SongActivity (e.g., selected item data)
+                intent.putExtra("songId", model.getId());
+
+//                System.out.println("========" + model.getId());
+
+                // Start the target Activity
+                context.startActivity(intent);
+            }
+        });
     }
 }
 

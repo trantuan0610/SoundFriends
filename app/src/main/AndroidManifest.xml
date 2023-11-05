@@ -22,7 +22,7 @@
             android:exported="true">
         </activity>
         <activity
-            android:name=".song"
+            android:name=".Song"
             android:exported="false" >
 
         </activity>

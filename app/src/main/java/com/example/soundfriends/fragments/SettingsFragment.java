@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.soundfriends.MainActivity;
 import com.example.soundfriends.R;
+import com.example.soundfriends.Song;
 import com.example.soundfriends.auth.Login;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.fragments.Model.UploadSongs;
@@ -48,6 +49,8 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.util.UUID;
 
 
 /**
@@ -223,7 +226,6 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
     }
 
     @Override
@@ -344,7 +346,9 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                         @Override
                         public void onSuccess(Uri uri) {
                             Log.d(TAG, "onSuccess: " + art);
-                            Songs uploadSong = new Songs(title1, artist1, category1, bitmap.toString(),uri.toString(), userID);
+
+                            String songId = createTransactionID();
+                            Songs uploadSong = new Songs(songId, title1, artist1, category1, bitmap.toString(),uri.toString(), userID);
                             String uploadId = referenceSongs.push().getKey();
                             referenceSongs.child(uploadId).setValue(uploadSong);                        }
                     });
@@ -383,4 +387,8 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         // ... Các phần khác của mã của Fragment ...
     }
 
+
+    public String createTransactionID(){
+        return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+    }
 }
