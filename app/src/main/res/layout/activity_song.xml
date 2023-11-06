@@ -66,7 +66,8 @@
             android:layout_marginLeft="60dp"
             android:layout_marginTop="30dp"
             android:layout_toRightOf="@+id/like"
-            android:src="@drawable/phonering" />
+            android:src="@drawable/phonering"
+            app:tint="@color/black" />
 
         <ImageView
             android:id="@+id/btnDownload"

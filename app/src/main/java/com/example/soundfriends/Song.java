@@ -1,13 +1,15 @@
 package com.example.soundfriends;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -15,7 +17,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -25,28 +26,24 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.soundfriends.fragments.Model.Songs;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class Song extends AppCompatActivity {
+public class Song extends AppCompatActivity implements SensorEventListener {
     boolean isPlaying = false;
     boolean isDirty = false;
     private MediaPlayer mediaPlayer;
@@ -57,7 +54,15 @@ public class Song extends AppCompatActivity {
     private String audioURL;
 
     private String songId = "";
+    private Sensor accelerometer;
+    private ImageView imageView;
+    int songIndex;
+    long songCount;
+    TextView next, previous;
 
+    private SensorManager sensorManager;
+    private Sensor accelerometerSensor;
+    private boolean isShakeEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +100,13 @@ public class Song extends AppCompatActivity {
                     String artist = songSnapshot.child("artist").getValue(String.class);
                     String imgUrl = songSnapshot.child("urlImg").getValue(String.class);
                     String srl = songSnapshot.child("srl").getValue(String.class);
+                    Integer nullIndex = songSnapshot.child("indexSong").getValue(Integer.class);
+                    if (nullIndex != null) {
+                        int currentIndex = nullIndex.intValue();
+                        if (currentIndex > songIndex) {
+                            songIndex = currentIndex;
+                        }
+                    }
 
                     audioURL = srl;
 
@@ -216,7 +228,218 @@ public class Song extends AppCompatActivity {
                 downloadAudio(audioURL);
             }
         });
+
+        //click next
+        next = findViewById(R.id.next);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               playNextSong();
+            }
+        });
+
+        //click previous
+        previous = findViewById(R.id.previous);
+
+        previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playPreviousSong();
+            }
+        });
+
+        //click on/off sensor shake
+
+        imageView = findViewById(R.id.phonering);
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isShakeEnabled = !isShakeEnabled;
+                if (isShakeEnabled) {
+                    imageView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.primary_pink));
+                } else {
+                    imageView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                }
+            }
+        });
+
+        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
     }
+
+    private void playNextSong() {
+
+        DatabaseReference songsRef = FirebaseDatabase.getInstance().getReference().child("songs");
+        songsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Đếm số lượng bài hát từ DataSnapshot
+                songCount = (int) dataSnapshot.getChildrenCount();
+                // Bây giờ bạn đã cập nhật giá trị của songCount dựa trên số lượng bài hát trên Firebase
+                // Bạn có thể sử dụng giá trị này trong code của bạn.
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Xử lý lỗi nếu cần
+            }
+        });
+
+        if (songIndex < songCount - 1) {
+            int nextSongIndex = songIndex + 1; // Tăng chỉ số bài hát để lấy bài hát tiếp theo
+            songIndex = nextSongIndex;
+//            Toast.makeText(getApplicationContext(), "oke " + songIndex, Toast.LENGTH_SHORT).show();
+            changeSong(nextSongIndex);
+        } else {
+            // Đã đến cuối danh sách bài hát
+            // ...
+        }
+
+//        Toast.makeText(getApplicationContext(), "oke " + songIndex, Toast.LENGTH_SHORT).show();
+
+    }
+
+    private void playPreviousSong() {
+        DatabaseReference songsRef = FirebaseDatabase.getInstance().getReference().child("songs");
+        songsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                songCount = (int) dataSnapshot.getChildrenCount();
+                if (songIndex > 0) {
+                    int previousSongIndex = songIndex - 1;
+                    songIndex = previousSongIndex;
+                    // Giảm chỉ số bài hát để lấy bài hát trước đó
+                    changeSong(previousSongIndex);
+                } else {
+                    // Đã ở đầu danh sách bài hát
+                    // Xử lý theo ý muốn của bạn, ví dụ: quay lại cuối danh sách hoặc hiển thị thông báo
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Xử lý lỗi nếu cần
+            }
+        });
+
+    }
+
+
+
+
+        private void changeSong(int next){
+        Toast.makeText(getApplicationContext(), "oke " + next, Toast.LENGTH_SHORT).show();
+        DatabaseReference songsRef = FirebaseDatabase.getInstance().getReference().child("songs");
+        mediaPlayer = new MediaPlayer();
+        Query songQuery = songsRef.orderByChild("indexSong").equalTo(next);
+        // Truy vấn dữ liệu
+        songQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot songSnapshot : dataSnapshot.getChildren()) {
+                    // Lấy ra kết quả truy vấn được
+                    String title = songSnapshot.child("title").getValue(String.class);
+                    String artist = songSnapshot.child("artist").getValue(String.class);
+                    String imgUrl = songSnapshot.child("urlImg").getValue(String.class);
+                    String srl = songSnapshot.child("srl").getValue(String.class);
+
+                    audioURL = srl;
+
+                    TextView textViewMusicTitle = findViewById(R.id.txtMusicTitle);
+                    textViewMusicTitle.setText(title);
+
+                    TextView txtArtist = findViewById(R.id.txtartist);
+                    txtArtist.setText(artist);
+
+                    ImageView imgSong = findViewById(R.id.imgsong);
+
+
+                    // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap)
+                    String base64Image = imgUrl;
+                    // Chuyển đổi chuỗi bitmap thành mảng byte
+                    byte[] imageBytes = Base64.decode(base64Image, Base64.DEFAULT);
+
+                    // Kiểm tra xem mảng byte có hợp lệ không
+                    if (imageBytes == null || imageBytes.length == 0) {
+                        Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Chuyển đổi mảng byte thành bitmap
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                    // Kiểm tra xem bitmap có hợp lệ không
+                    if (bitmap == null) {
+                        Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Bitmap đã tải xong, hiển thị nó bằng Glide
+                    Glide.with(imgSong.getContext())
+                            .as(Bitmap.class)
+                            .load(bitmap)
+                            .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
+                            .error(com.google.firebase.database.ktx.R.drawable.common_google_signin_btn_icon_dark_normal)
+                            .circleCrop()
+                            .into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    imgSong.setImageBitmap(resource);
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+                                    // Xử lý khi tải bị xóa (nếu cần)
+                                }
+                            });
+
+
+                    try {
+                        mediaPlayer.setDataSource(srl);
+                        mediaPlayer.prepare();
+
+                        seekBar = findViewById(R.id.seekbar);
+                        seekBar.setMax(mediaPlayer.getDuration());
+
+                        final Runnable updateSeekBar = new Runnable() {
+                            @Override
+                            public void run() {
+                                TextView txtCurrentDuration = findViewById(R.id.txtCurrentDuration);
+                                TextView txtDuration = findViewById(R.id.txtDuration);
+                                currentPosition = mediaPlayer.getCurrentPosition();
+                                txtCurrentDuration.setText(formatDuration(mediaPlayer.getCurrentPosition()));
+                                txtDuration.setText(formatDuration(mediaPlayer.getDuration()));
+                                seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                                handler.postDelayed(this, 100); // update every 100ms
+                            }
+                        };
+                        handler.postDelayed(updateSeekBar, 100);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle potential errors
+            }
+        });
+    }
+
+
+
+
 
     private void resumeAudio() {
         if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
@@ -271,5 +494,44 @@ public class Song extends AppCompatActivity {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER && isShakeEnabled) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            // Tính gia tốc tổng cộng
+            double acceleration = Math.sqrt(x * x + y * y + z * z);
+
+            // Kiểm tra nếu gia tốc vượt qua một ngưỡng (đây là ví dụ)
+            if (acceleration > 12) {
+                // Xử lý sự kiện lắc, ví dụ: chuyển bài hát
+                Toast.makeText(getApplicationContext(), "xảy ra sự kiện lắc", Toast.LENGTH_SHORT).show();
+                playNextSong();
+            }
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Ngừng lắng nghe sensor khi ứng dụng tạm dừng
+        sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Tiếp tục lắng nghe sensor khi ứng dụng tiếp tục
+        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
