@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
@@ -99,6 +101,10 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
     ImageView settingsAvatar;
     Button btnLogout, btnUpload, buttonUpload;
     Bitmap bitmap;
+    int songIndex;
+
+
+
     public SettingsFragment() {
         // Required empty public constructor
     }
@@ -215,6 +221,36 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             @Override
             public void onClick(View view) {
                 uploadFileTofirebase(view);
+            }
+        });
+
+        // Truy vấn dữ liệu từ Firebase để tìm giá trị indexSong lớn hơn 0 mà đang còn trống
+        songsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int maxSongIndex = 0; // Khởi tạo một giá trị mặc định
+
+                for (DataSnapshot songSnapshot : dataSnapshot.getChildren()) {
+                    Integer currentIndex = songSnapshot.child("indexSong").getValue(Integer.class);
+                    if (currentIndex != null) {
+                        if (currentIndex > maxSongIndex) {
+                            maxSongIndex = currentIndex;
+                        }
+                    }
+                }
+
+                // Tìm index trống lớn hơn 0 và cập nhật songIndex
+                for (int i = 1; i <= maxSongIndex + 1; i++) {
+                    if (isIndexAvailable(i, dataSnapshot)) {
+                        songIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Xử lý lỗi nếu cần
             }
         });
 
@@ -362,15 +398,15 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                     storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference songsRef = database.getReference("songs");
                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                             byte[] imageBytes = byteArrayOutputStream.toByteArray();
-                            String base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
-
-                            Log.d(TAG, "onSuccess: " + art);
+                            String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
                             String songId = createTransactionID();
-                            Songs uploadSong = new Songs(songId, title1, artist1, category1, base64Image,uri.toString(), userID);
+                            Songs uploadSong = new Songs(songIndex, songId, title1, artist1, category1, base64Image,uri.toString(), userID);
                             String uploadId = referenceSongs.push().getKey();
                             referenceSongs.child(uploadId).setValue(uploadSong);
 
@@ -414,5 +450,15 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
     public String createTransactionID(){
         return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+    }
+
+    private boolean isIndexAvailable(int index, DataSnapshot dataSnapshot) {
+        for (DataSnapshot songSnapshot : dataSnapshot.getChildren()) {
+            Integer currentIndex = songSnapshot.child("indexSong").getValue(Integer.class);
+            if (currentIndex != null && currentIndex == index) {
+                return false; // Index đã tồn tại, không khả dụng
+            }
+        }
+        return true; // Index trống, khả dụng
     }
 }

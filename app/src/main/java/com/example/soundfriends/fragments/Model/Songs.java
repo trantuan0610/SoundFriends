@@ -5,11 +5,12 @@ import android.graphics.Bitmap;
 public class Songs {
 
         public  String id, title, artist, category, urlImg, srl, userID;
+        int indexSong;
 
         public Songs() {
         }
 
-        public Songs(String id, String title, String artist, String category, String urlImg, String srl, String userID) {
+        public Songs(int indexSong, String id, String title, String artist, String category, String urlImg, String srl, String userID) {
 
 
             if(title.trim().equals("")){
@@ -23,6 +24,7 @@ public class Songs {
             this.urlImg = urlImg;
             this.srl = srl;
             this.userID = userID;
+            this.indexSong = indexSong;
         }
 
 
@@ -73,5 +75,17 @@ public class Songs {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getIndexSong() {
+        return indexSong;
+    }
+
+    public void setIndexSong(int indexSong) {
+        this.indexSong = indexSong;
     }
 }
