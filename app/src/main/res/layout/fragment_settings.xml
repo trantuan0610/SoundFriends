@@ -37,7 +37,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/bgregister"
+                    android:src="@drawable/empty_avatar"
                     app:shapeAppearanceOverlay="@style/circleImageStyle"/>
             </LinearLayout>
             <Button
