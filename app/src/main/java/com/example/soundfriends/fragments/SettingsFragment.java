@@ -159,7 +159,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         rcvProgressBar = view.findViewById(R.id.rcvProgressBar);
 
 //        rcvlist_song_uploaded.setLayoutManager(new LinearLayoutManager(requireContext()));
-        rcvlist_song_uploaded.setLayoutManager(new WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        rcvlist_song_uploaded.setLayoutManager(new WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
         //get Firebase user
         auth = FirebaseAuth.getInstance();

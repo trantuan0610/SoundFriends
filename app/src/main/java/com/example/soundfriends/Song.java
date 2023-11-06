@@ -145,7 +145,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                             .load(bitmap)
                             .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
                             .error(com.google.firebase.database.ktx.R.drawable.common_google_signin_btn_icon_dark_normal)
-                            .circleCrop()
                             .into(new CustomTarget<Bitmap>() {
                                 @Override
                                 public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
