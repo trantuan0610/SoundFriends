@@ -43,6 +43,7 @@ import com.example.soundfriends.auth.Login;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.fragments.Model.UploadSongs;
 import com.example.soundfriends.utils.ToggleShowHideUI;
+import com.example.soundfriends.utils.WrapContentLinearLayoutManager;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -157,7 +158,8 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         rcvlist_song_uploaded = view.findViewById(R.id.rcvlist_song_uploaded);
         rcvProgressBar = view.findViewById(R.id.rcvProgressBar);
 
-        rcvlist_song_uploaded.setLayoutManager(new LinearLayoutManager(requireContext()));
+//        rcvlist_song_uploaded.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rcvlist_song_uploaded.setLayoutManager(new WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
 
         //get Firebase user
         auth = FirebaseAuth.getInstance();
