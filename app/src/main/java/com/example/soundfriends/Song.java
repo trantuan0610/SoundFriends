@@ -18,6 +18,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -58,7 +59,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     private ImageView imageView;
     int songIndex;
     long songCount;
-    TextView next, previous;
+    ImageButton next, previous, play, pause;
 
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
@@ -69,8 +70,36 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
 
-        Song thisActivity = this;
+        getData();
 
+        //click on/off sensor shake
+
+        imageView = findViewById(R.id.phonering);
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isShakeEnabled = !isShakeEnabled;
+                if (isShakeEnabled) {
+                    imageView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.primary_pink));
+                } else {
+                    imageView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                }
+            }
+        });
+
+        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+    }
+
+    private void getData() {
         // Retrieve data from the Intent
         Intent intent = getIntent();
         if (intent != null) {
@@ -197,25 +226,26 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-        TextView txtPlay = findViewById(R.id.txtplay);
+        play = findViewById(R.id.play);
         ImageView imgDownload = findViewById(R.id.btnDownload);
 
-        txtPlay.setOnClickListener(new View.OnClickListener() {
+        play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isDirty) {
-                    playAudio(thisActivity);
-                    txtPlay.setText("Pause");
-                    isPlaying = true;
+                    playAudio();
+                    play.setImageResource(R.drawable.pause);
+                    isPlaying =true;
                     isDirty = true;
-                    return;
-                }
-                if (!isPlaying) {
-                    resumeAudio();
-                    txtPlay.setText("Pause");
                 } else {
-                    mediaPlayer.pause();
-                    txtPlay.setText("Play");
+                    if (!isPlaying) {
+                        resumeAudio();
+                        play.setImageResource(R.drawable.pause);
+                    } else {
+                        mediaPlayer.seekTo(currentPosition);
+                        mediaPlayer.pause();
+                        play.setImageResource(R.drawable.play);
+                    }
                 }
                 isPlaying = !isPlaying;
             }
@@ -233,7 +263,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               playNextSong();
+                playNextSong();
             }
         });
 
@@ -246,32 +276,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 playPreviousSong();
             }
         });
-
-        //click on/off sensor shake
-
-        imageView = findViewById(R.id.phonering);
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isShakeEnabled = !isShakeEnabled;
-                if (isShakeEnabled) {
-                    imageView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.primary_pink));
-                } else {
-                    imageView.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
-                }
-            }
-        });
-
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
     }
 
     private void playNextSong() {
@@ -335,9 +339,20 @@ public class Song extends AppCompatActivity implements SensorEventListener {
 
 
         private void changeSong(int next){
-        Toast.makeText(getApplicationContext(), "oke " + next, Toast.LENGTH_SHORT).show();
+            // Dừng bài hát hiện tại nếu đang chạy
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
+                }
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+
+            // Khởi tạo MediaPlayer
+            mediaPlayer = new MediaPlayer();
+
         DatabaseReference songsRef = FirebaseDatabase.getInstance().getReference().child("songs");
-        mediaPlayer = new MediaPlayer();
         Query songQuery = songsRef.orderByChild("indexSong").equalTo(next);
         // Truy vấn dữ liệu
         songQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -400,8 +415,8 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                                 }
                             });
 
-
                     try {
+                        // ... (Các bước khác để chuẩn bị bài hát mới)
                         mediaPlayer.setDataSource(srl);
                         mediaPlayer.prepare();
 
@@ -416,16 +431,16 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                                 currentPosition = mediaPlayer.getCurrentPosition();
                                 txtCurrentDuration.setText(formatDuration(mediaPlayer.getCurrentPosition()));
                                 txtDuration.setText(formatDuration(mediaPlayer.getDuration()));
-                                seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                                seekBar.setProgress(currentPosition);
                                 handler.postDelayed(this, 100); // update every 100ms
                             }
                         };
                         handler.postDelayed(updateSeekBar, 100);
+
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
-
 
             }
 
@@ -434,6 +449,10 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 // Handle potential errors
             }
         });
+
+            resumeAudio();
+            play.setImageResource(R.drawable.play);
+            isDirty=false;
     }
 
 
@@ -453,7 +472,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         mediaPlayer.release();
     }
 
-    private void playAudio(Song thisActivity) {
+    private void playAudio() {
         // Chạy các hàm cần thực thi sau khi lấy được nhạc
         mediaPlayer.start();
         // below line is use to display a toast message.

@@ -114,52 +114,54 @@
         android:layout_marginTop="30dp"
         android:background="@color/white">
 
-        <TextView
+        <ImageButton
             android:id="@+id/shuffle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Shuffle"
+            android:layout_centerVertical="true"
+            android:src="@drawable/shuffle"
+            android:background="@null"
             android:textColor="@color/black" />
 
-        <TextView
+        <ImageButton
             android:id="@+id/previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/shuffle"
-            android:paddingLeft="25dp"
-            android:text="Previous"
+            android:src="@drawable/previous"
+            android:background="@null"
+            android:layout_toRightOf="@+id/shuffle"
             android:textColor="@color/black" />
 
-        <TextView
-            android:id="@+id/txtplay"
+
+        <ImageButton
+            android:id="@+id/play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/previous"
-            android:paddingLeft="25dp"
-            android:text="Play"
+            android:src="@drawable/play"
+            android:background="@null"
+            android:layout_toRightOf="@+id/previous"
             android:textColor="@color/black" />
 
-        <TextView
+
+        <ImageButton
             android:id="@+id/next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/txtplay"
-            android:background="@color/white"
-            android:paddingLeft="25dp"
-            android:text="Next"
+            android:src="@drawable/next"
+            android:background="@null"
+            android:layout_toRightOf="@+id/play"
             android:textColor="@color/black" />
 
-        <TextView
+        <ImageButton
             android:id="@+id/loop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/next"
-            android:background="@color/white"
-            android:paddingLeft="25dp"
-            android:text="Loop"
-            android:textColor="@color/black"
+            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@+id/next"
+            android:src="@drawable/loop"
+            android:background="@null"
+            android:textColor="@color/black" />
 
-            />
 
     </RelativeLayout>
 
