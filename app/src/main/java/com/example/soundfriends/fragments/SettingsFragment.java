@@ -8,14 +8,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,14 +33,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.soundfriends.MainActivity;
 import com.example.soundfriends.R;
-import com.example.soundfriends.Song;
 import com.example.soundfriends.auth.Login;
 import com.example.soundfriends.fragments.Model.Songs;
-import com.example.soundfriends.fragments.Model.UploadSongs;
+import com.example.soundfriends.adapter.UploadSongs;
 import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.example.soundfriends.utils.WrapContentLinearLayoutManager;
+import com.example.soundfriends.utils.uuid;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -135,6 +131,10 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        //get Firebase user
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
     }
 
     @Override
@@ -161,13 +161,10 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 //        rcvlist_song_uploaded.setLayoutManager(new LinearLayoutManager(requireContext()));
         rcvlist_song_uploaded.setLayoutManager(new WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
-        //get Firebase user
-        auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
-
 
         if(user == null) {
             goAuthActivity();
+            Toast.makeText(getContext(), "Vui lòng đăng nhập để sử dụng tính năng này", Toast.LENGTH_LONG).show();
         }else {
             userID = user.getUid();
             String info = user.getEmail() != null ? user.getEmail() : user.getDisplayName();
@@ -177,7 +174,6 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                 String url = user.getPhotoUrl().toString();
                 Glide.with(this).load(Uri.parse(url)).into(settingsAvatar);
             }
-
         }
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,13 +184,10 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         });
 
         //Nếu UserID lưu trong songs trùng với UserIDLogin thì hiện danh sách bài hát mà 2 user đấy trùng nhau
-        FirebaseUser userIDLogin = FirebaseAuth.getInstance().getCurrentUser();
-        String userIDLoginString = userIDLogin.getUid(); // Lấy UID của người dùng hiện tại
-
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference songsRef = database.getReference("songs");
 
-        Query query = songsRef.orderByChild("userID").equalTo(userIDLoginString);
+        Query query = songsRef.orderByChild("userID").equalTo(userID);
 
         FirebaseRecyclerOptions<Songs> options = new FirebaseRecyclerOptions.Builder<Songs>()
                 .setQuery(query, Songs.class)
@@ -407,7 +400,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                             byte[] imageBytes = byteArrayOutputStream.toByteArray();
                             String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
-                            String songId = createTransactionID();
+                            String songId = uuid.createTransactionID();
                             Songs uploadSong = new Songs(songIndex, songId, title1, artist1, category1, base64Image,uri.toString(), userID);
                             String uploadId = referenceSongs.push().getKey();
                             referenceSongs.child(uploadId).setValue(uploadSong);
@@ -447,11 +440,6 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
     public class YourFragment extends Fragment {
         // ... Các phần khác của mã của Fragment ...
-    }
-
-
-    public String createTransactionID(){
-        return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
 
     private boolean isIndexAvailable(int index, DataSnapshot dataSnapshot) {

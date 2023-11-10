@@ -1,8 +1,4 @@
-package com.example.soundfriends.fragments.Model;
-
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
-import static java.security.AccessController.getContext;
+package com.example.soundfriends.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +19,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.soundfriends.R;
 import com.example.soundfriends.Song;
+import com.example.soundfriends.fragments.Model.Songs;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
