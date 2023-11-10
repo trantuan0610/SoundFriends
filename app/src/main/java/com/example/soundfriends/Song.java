@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.soundfriends.fragments.CommentsFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -71,6 +72,8 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         setContentView(R.layout.activity_song);
 
         getData();
+        //send song id to load comment of that song
+        sendDataToFragment(songId);
 
         //click on/off sensor shake
 
@@ -109,9 +112,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         // Create a reference to the "songs" node in your Firebase Realtime Database
         DatabaseReference songsRef = FirebaseDatabase.getInstance().getReference().child("songs");
 
-
-        System.out.println("ID+++++++++: " + songId);
-
         // Query the specific song by its ID
         Query songQuery = songsRef.orderByChild("id").equalTo(songId);
 
@@ -120,9 +120,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         songQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                System.out.println("HHUHUHUHUHHUHUU");
-
                 for (DataSnapshot songSnapshot : dataSnapshot.getChildren()) {
                     // Lấy ra kết quả truy vấn được
                     String title = songSnapshot.child("title").getValue(String.class);
@@ -306,8 +303,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             // ...
         }
 
-//        Toast.makeText(getApplicationContext(), "oke " + songIndex, Toast.LENGTH_SHORT).show();
-
     }
 
     private void playPreviousSong() {
@@ -334,9 +329,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         });
 
     }
-
-
-
 
         private void changeSong(int next){
             // Dừng bài hát hiện tại nếu đang chạy
@@ -375,6 +367,8 @@ public class Song extends AppCompatActivity implements SensorEventListener {
 
                     ImageView imgSong = findViewById(R.id.imgsong);
 
+                    //update comment per song
+                    sendDataToFragment(songSnapshot.child("id").getValue(String.class));
 
                     // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap)
                     String base64Image = imgUrl;
@@ -402,7 +396,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                             .load(bitmap)
                             .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
                             .error(com.google.firebase.database.ktx.R.drawable.common_google_signin_btn_icon_dark_normal)
-                            .circleCrop()
                             .into(new CustomTarget<Bitmap>() {
                                 @Override
                                 public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
@@ -454,10 +447,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             play.setImageResource(R.drawable.play);
             isDirty=false;
     }
-
-
-
-
 
     private void resumeAudio() {
         if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
@@ -551,5 +540,20 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    private void sendDataToFragment(String songId){
+        //create comment fragment
+        CommentsFragment commentsFragment = new CommentsFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("key_song_id", songId);
+        commentsFragment.setArguments(bundle);
+
+        //use FragmentManager
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.comment_fragment_container, commentsFragment)
+                .commit();
     }
 }

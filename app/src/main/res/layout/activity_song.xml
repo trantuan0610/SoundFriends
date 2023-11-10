@@ -4,216 +4,192 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
     android:orientation="vertical"
     tools:context=".Song">
 
-    <TextView
-        android:id="@+id/txtMusicTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Song title"
-        android:textAllCaps="true"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/txtartist"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Song artist"
-        android:textSize="16sp" />
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:cardCornerRadius="12dp">
-
-        <ImageView
-            android:id="@+id/imgsong"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:src="@drawable/logo" />
-
-    </androidx.cardview.widget.CardView>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/like"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginTop="30dp"
-            android:src="@drawable/like" />
-
-        <TextView
-            android:id="@+id/textlike"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="33dp"
-            android:layout_marginLeft="2dp"
-            android:layout_toRightOf="@id/like"
-            android:text="123" />
-
-        <ImageView
-            android:id="@+id/phonering"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginTop="30dp"
-            android:layout_toRightOf="@+id/like"
-            android:src="@drawable/phonering"
-            app:tint="@color/black" />
-
-        <ImageView
-            android:id="@+id/btnDownload"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginTop="30dp"
-            android:layout_toRightOf="@+id/phonering"
-            android:src="@drawable/download" />
-
-    </RelativeLayout>
-
-    <SeekBar
-        android:id="@+id/seekbar"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:progress="0"
-
-        />
-
-    <RelativeLayout
-        android:layout_width="300dp"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/txtCurrentDuration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00" />
-
-        <TextView
-            android:id="@+id/txtDuration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="00:00" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:background="@color/white">
-
-        <ImageButton
-            android:id="@+id/shuffle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:src="@drawable/shuffle"
-            android:background="@null"
-            android:textColor="@color/black" />
-
-        <ImageButton
-            android:id="@+id/previous"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/previous"
-            android:background="@null"
-            android:layout_toRightOf="@+id/shuffle"
-            android:textColor="@color/black" />
-
-
-        <ImageButton
-            android:id="@+id/play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/play"
-            android:background="@null"
-            android:layout_toRightOf="@+id/previous"
-            android:textColor="@color/black" />
-
-
-        <ImageButton
-            android:id="@+id/next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/next"
-            android:background="@null"
-            android:layout_toRightOf="@+id/play"
-            android:textColor="@color/black" />
-
-        <ImageButton
-            android:id="@+id/loop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_toRightOf="@+id/next"
-            android:src="@drawable/loop"
-            android:background="@null"
-            android:textColor="@color/black" />
-
-
-    </RelativeLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:text="Bình luận"
-        android:textSize="18dp"
-        android:textStyle="bold" />
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        >
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/avatar1"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/empty_avatar"
-            android:layout_centerVertical="true"
-            app:shapeAppearanceOverlay="@style/circleImageStyle"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputComment"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@+id/avatar1">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/txtMusicTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Bình luận ..." />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginTop="20dp"
+                android:text="Song title"
+                android:textAllCaps="true"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:backgroundTint="@android:color/transparent"
-            android:src="@drawable/send"
-            android:scaleType="fitCenter"
-            android:layout_alignRight="@id/inputComment"
-            android:layout_centerVertical="true"
-            android:contentDescription="Send Comment"/>
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/txtartist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Song artist"
+                android:textSize="16sp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="12dp">
+
+                <ImageView
+                    android:id="@+id/imgsong"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
+                    android:src="@drawable/logo" />
+
+            </androidx.cardview.widget.CardView>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/like"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="30dp"
+                    android:src="@drawable/like" />
+
+                <TextView
+                    android:id="@+id/textlike"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="33dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_toRightOf="@id/like"
+                    android:text="123" />
+
+                <ImageView
+                    android:id="@+id/phonering"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="60dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_toRightOf="@+id/like"
+                    android:src="@drawable/phonering"
+                    app:tint="@color/black" />
+
+                <ImageView
+                    android:id="@+id/btnDownload"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="60dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_toRightOf="@+id/phonering"
+                    android:src="@drawable/download" />
+
+            </RelativeLayout>
+
+            <SeekBar
+                android:id="@+id/seekbar"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:progress="0"
+
+                />
+
+            <RelativeLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txtCurrentDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00" />
+
+                <TextView
+                    android:id="@+id/txtDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="00:00" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp">
+
+                <ImageButton
+                    android:id="@+id/shuffle"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="20dp"
+                    android:background="@null"
+                    android:contentDescription="Shuffle"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/shuffle"
+                    android:textColor="@color/black"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <ImageButton
+                    android:id="@+id/previous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/previous"
+                    android:background="@null"
+                    android:layout_toRightOf="@+id/shuffle"
+                    android:textColor="@color/black"
+                    android:layout_marginRight="10dp"
+                    android:contentDescription="Previous"/>
+
+
+                <ImageButton
+                    android:id="@+id/play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/play"
+                    android:background="@null"
+                    android:layout_toRightOf="@+id/previous"
+                    android:contentDescription="Play or Pause"
+                    android:textColor="@color/black" />
+
+
+                <ImageButton
+                    android:id="@+id/next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/next"
+                    android:background="@null"
+                    android:layout_toRightOf="@+id/play"
+                    android:textColor="@color/black"
+                    android:layout_marginLeft="10dp"
+                    android:contentDescription="Next"/>
+
+                <ImageButton
+                    android:id="@+id/loop"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_toRightOf="@+id/next"
+                    android:background="@null"
+                    android:contentDescription="Loop"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/loop"
+                    android:textColor="@color/black"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+            </RelativeLayout>
+            <FrameLayout
+                android:id="@+id/comment_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>
