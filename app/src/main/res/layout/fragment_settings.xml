@@ -78,7 +78,8 @@
                     android:id="@+id/img1"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/logo" />
+                    android:src="@drawable/logo"
+                    android:layout_marginTop="10dp"/>
 
                 <LinearLayout
                     android:id="@+id/ln_layout"
@@ -87,37 +88,40 @@
                     android:layout_toRightOf="@+id/img1"
                     android:orientation="vertical">
 
-                    <TextView
+                    <EditText
                         android:id="@+id/tvSong"
                         android:layout_width="240dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:contentDescription="#000"
+                        android:minHeight="48dp"
                         android:text="Tên bài hát"
+                        android:hint="Tên bài hát"
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/tvArtist"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvSong"
                         android:layout_marginLeft="10dp"
-                        android:contentDescription="#000"
+                        android:minHeight="48dp"
                         android:text="Nghệ sĩ"
+                        android:hint="Nghệ sĩ"
                         android:textColor="@color/black"
                         android:textSize="18sp" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/tvCategory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvArtist"
                         android:layout_marginLeft="10dp"
-                        android:contentDescription="#000"
+                        android:minHeight="48dp"
                         android:text="Thể loại"
-                        android:textColor="@color/black"/>
+                        android:hint="Thể loại"
+                        android:textColor="@color/black" />
 
                     <TextView
                         android:id="@+id/tvsrl"

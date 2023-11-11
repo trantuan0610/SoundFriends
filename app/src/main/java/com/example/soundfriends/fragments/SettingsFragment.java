@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -78,7 +79,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
     MediaMetadataRetriever metadataRetriever;
     byte [] art ;
     String title1, artist1, imageView1 = "", category1, userID;
-    TextView title,artist,category;
+    EditText title,artist,category;
     ImageView imageView ;
     String TAG = "huhu";
     UploadSongs uploadSongs;
@@ -215,7 +216,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         buttonUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                uploadFileTofirebase(view);
+                uploadFileToFirebase(view);
             }
         });
 
@@ -364,17 +365,16 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         return  result;
     }
 
-    public  void  uploadFileTofirebase (View v ){
-        if(textViewImage.equals("No file Selected")){
-            Toast.makeText(getContext(), "Please select an image!", Toast.LENGTH_SHORT).show();
+    public  void  uploadFileToFirebase (View v ){
+        if(textViewImage.equals("Chưa chọn file audio")){
+            Toast.makeText(getContext(), "Vui lòng chọn ảnh!", Toast.LENGTH_SHORT).show();
         }
         else{
             if(mUploadsTask != null && mUploadsTask.isInProgress()){
-                Toast.makeText(getContext(), "songs uploads in already progress!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Bài hát đang được tải lên!", Toast.LENGTH_SHORT).show();
                 ToggleShowHideUI.toggleShowUI(true, progressBar);
             }else {
                 uploadFiles();
-                ToggleShowHideUI.toggleShowUI(true, progressBar);
             }
         }
 
@@ -382,10 +382,14 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
     private void uploadFiles() {
 
-        if(audioUri != null){
-            Toast.makeText(getContext(), "uploads please wait!", Toast.LENGTH_SHORT).show();
-            progressBar.setVisibility(View.VISIBLE);
-            final  StorageReference storageReference = mStorageref.child(System.currentTimeMillis()+"."+getfileextension(audioUri));
+        title1 = title.getText().toString().trim();
+        artist1 = artist.getText().toString().trim();
+        category1 = category.getText().toString().trim();
+
+        if(audioUri != null && !title1.isEmpty() && !artist1.isEmpty() && !category1.isEmpty()){
+            Toast.makeText(getContext(), "Đang tải lên, vui lòng chờ!", Toast.LENGTH_SHORT).show();
+            ToggleShowHideUI.toggleShowUI(true, progressBar);
+            final  StorageReference storageReference = mStorageref.child(System.currentTimeMillis()+"."+ getFileExtension(audioUri));
             mUploadsTask = storageReference.putFile(audioUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -395,13 +399,18 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                         public void onSuccess(Uri uri) {
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                             DatabaseReference songsRef = database.getReference("songs");
-                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-                            byte[] imageBytes = byteArrayOutputStream.toByteArray();
-                            String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
+                            //process image
+                            String base64Image = "";
+                            if(bitmap != null){
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                                byte[] imageBytes = byteArrayOutputStream.toByteArray();
+                                base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+                            }
 
                             String songId = uuid.createTransactionID();
-                            Songs uploadSong = new Songs(songIndex, songId, title1, artist1, category1, base64Image,uri.toString(), userID);
+                            Songs uploadSong = new Songs(songIndex, songId, title1, artist1, category1, base64Image, uri.toString(), userID);
                             String uploadId = referenceSongs.push().getKey();
                             referenceSongs.child(uploadId).setValue(uploadSong);
 
@@ -409,6 +418,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                             ToggleShowHideUI.toggleShowUI(false, progressBar);
                             Toast.makeText(getContext(), "Tải lên thành công!", Toast.LENGTH_SHORT).show();
                             ToggleShowHideUI.toggleShowUI(false, rlUploadingSong);
+
                         }
                     });
 
@@ -424,11 +434,11 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             });
 
         }else {
-            Toast.makeText(getContext(), "No file Selected to uploads", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "File tải lên chưa đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private  String getfileextension(Uri audioUri){
+    private  String getFileExtension(Uri audioUri){
 
         ContentResolver contentResolver = getContext().getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
