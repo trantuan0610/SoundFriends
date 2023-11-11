@@ -151,19 +151,19 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                     byte[] imageBytes = Base64.decode(base64Image, Base64.DEFAULT);
 
                     // Kiểm tra xem mảng byte có hợp lệ không
-                    if (imageBytes == null || imageBytes.length == 0) {
+                    if (imageBytes == null) {
                         Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     // Chuyển đổi mảng byte thành bitmap
                     Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-                    // Kiểm tra xem bitmap có hợp lệ không
-                    if (bitmap == null) {
-                        Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+//
+//                    // Kiểm tra xem bitmap có hợp lệ không
+//                    if (bitmap == null) {
+//                        Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
+//                        return;
+//                    }
 
                     // Bitmap đã tải xong, hiển thị nó bằng Glide
                     Glide.with(imgSong.getContext())
