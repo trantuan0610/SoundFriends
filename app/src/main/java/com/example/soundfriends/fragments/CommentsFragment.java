@@ -13,8 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.soundfriends.R;
 import com.example.soundfriends.Song;
 import com.example.soundfriends.adapter.CommentAdapter;
@@ -23,7 +25,9 @@ import com.example.soundfriends.utils.WrapContentLinearLayoutManager;
 import com.example.soundfriends.utils.uuid;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,6 +48,8 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class CommentsFragment extends Fragment {
+    ImageView currentAvatarComment;
+    TextInputLayout commentInputLayout;
     TextInputEditText edtComment;
     ImageButton btnSubmitComment;
     RecyclerView rcvComment;
@@ -106,8 +112,16 @@ public class CommentsFragment extends Fragment {
         currentSongId = getArguments().getString("key_song_id");
 
         rcvComment = view.findViewById(R.id.rcvComments);
+        currentAvatarComment = view.findViewById(R.id.currentAvatarComment);
+        commentInputLayout = (TextInputLayout) view.findViewById(R.id.edtComment);
         edtComment = (TextInputEditText) view.findViewById(R.id.edtCommentBody);
         btnSubmitComment = view.findViewById(R.id.submitCommentButton);
+
+        //load current user information to comment input set
+        FirebaseUser user = auth.getCurrentUser();
+        Glide.with(this).load(user.getPhotoUrl()).into(currentAvatarComment);
+        String username = user.getEmail() != null ? user.getEmail() : user.getDisplayName();
+        commentInputLayout.setHint("Bình luận với tư cách "+ username);
 
         //initial recycler view
         rcvComment.setLayoutManager(new WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));

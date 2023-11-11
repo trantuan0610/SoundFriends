@@ -21,8 +21,11 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
     private List<Comment> comments;
@@ -43,12 +46,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = comments.get(position);
+        String commentTime = comment.getTimestamp();
+
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        LocalDateTime dateTime = LocalDateTime.parse(commentTime, inputFormatter);
+
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy 'lúc' HH:mm");
+        String formattedTime = dateTime.format(outputFormatter);
 
         if(comment == null) return;
 
         holder.tvAccount.setText(comment.getUsername());
         holder.tvBody.setText(comment.getBody());
-        holder.tvTime.setText(comment.getTimestamp());
+        holder.tvTime.setText(formattedTime);
         Glide.with(context).load(Uri.parse(comment.getAvatarUrl())).placeholder(R.drawable.empty_avatar).into(holder.avatarComment);
         holder.tvTextLike.setText(String.valueOf(comment.getLikeCount()));
     }

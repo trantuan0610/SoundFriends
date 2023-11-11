@@ -59,7 +59,7 @@
         </LinearLayout>
 
         <ImageButton
-            android:id="@+id/imgbtn"
+            android:id="@+id/btn_pop_up"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
