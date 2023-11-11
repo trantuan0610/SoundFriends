@@ -31,7 +31,7 @@
             >
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/avatar1"
+                android:id="@+id/currentAvatarComment"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/empty_avatar"
@@ -44,13 +44,14 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginLeft="20dp"
-                android:layout_toRightOf="@+id/avatar1">
+                android:layout_toRightOf="@+id/currentAvatarComment">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtCommentBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nhập bình luận" />
+                    android:hint="Nhập bình luận"
+                    android:paddingEnd="50dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <ImageButton
