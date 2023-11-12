@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         viewPager = (ViewPager2) findViewById(R.id.view_pager);
+        viewPager.setUserInputEnabled(false);
 //        viewPager.setPageTransformer(new ZoomOutPageTransformer());
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
 

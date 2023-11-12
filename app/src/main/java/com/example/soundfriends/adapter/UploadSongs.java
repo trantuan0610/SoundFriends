@@ -25,6 +25,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.soundfriends.R;
 import com.example.soundfriends.Song;
 import com.example.soundfriends.fragments.Model.Songs;
+import com.example.soundfriends.utils.ImageProcessor;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -65,44 +66,8 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
             holder.artist.setText(model.getArtist());
             holder.category.setText(model.getCategory());
 
-            // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap)
-            String base64Image = model.getUrlImg();
-            // Chuyển đổi chuỗi bitmap thành mảng byte
-            byte[] imageBytes = Base64.decode(base64Image, Base64.DEFAULT);
-
-            // Kiểm tra xem mảng byte có hợp lệ không
-            if (imageBytes == null) {
-                Toast.makeText(holder.imageView.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Chuyển đổi mảng byte thành bitmap
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-//
-//            // Kiểm tra xem bitmap có hợp lệ không
-//            if (bitmap == null) {
-//                Toast.makeText(holder.imageView.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-
-            // Bitmap đã tải xong, hiển thị nó bằng Glide
-            Glide.with(holder.imageView.getContext())
-                    .as(Bitmap.class)
-                    .load(bitmap)
-                    .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
-                    .error(com.google.firebase.database.ktx.R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .circleCrop()
-                    .into(new CustomTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                            holder.imageView.setImageBitmap(resource);
-                        }
-
-                        @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
-                            // Xử lý khi tải bị xóa (nếu cần)
-                        }
-                    });
+            ImageProcessor imageProcessor = new ImageProcessor();
+            imageProcessor.Base64ToImageView(holder.imageView, holder.imageView.getContext(), model.getUrlImg());
         } else {
             holder.itemView.setVisibility(View.GONE);
         }

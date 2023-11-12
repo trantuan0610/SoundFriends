@@ -1,7 +1,9 @@
 package com.example.soundfriends.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +14,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.soundfriends.R;
+import com.example.soundfriends.fragments.CommentsFragment;
 import com.example.soundfriends.fragments.Model.Comment;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -30,6 +35,7 @@ import java.util.Locale;
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
     private List<Comment> comments;
     private Context context;
+    public static final String ACTION_REPLY_BUTTON_CLICK = "action_reply_button_click";
 
     public CommentAdapter(Context context,List<Comment> comments) {
         this.context = context;
@@ -46,6 +52,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = comments.get(position);
+
+        //bind item click event
+        handleItemClickHolder(holder, comment);
+
         String commentTime = comment.getTimestamp();
 
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
@@ -85,6 +95,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             tvBody = itemView.findViewById(R.id.bodyComment);
             tvTextLike = itemView.findViewById(R.id.textLikeComment);
             btnLikeComment = itemView.findViewById(R.id.likeComment);
+            btnReplyComment = itemView.findViewById(R.id.replyComment);
         }
+    }
+
+    private void handleItemClickHolder(CommentViewHolder holder, Comment model){
+        holder.btnReplyComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent replyIntent = new Intent(ACTION_REPLY_BUTTON_CLICK);
+                replyIntent.putExtra("data", model.getUsername());
+                LocalBroadcastManager.getInstance(view.getContext()).sendBroadcast(replyIntent);
+            }
+        });
     }
 }

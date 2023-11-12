@@ -14,11 +14,12 @@
         android:background="@color/white"
         android:padding="15dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img2"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/logo" />
+            android:src="@drawable/logo"
+            app:shapeAppearanceOverlay="@style/circleImageStyle"/>
 
         <LinearLayout
             android:id="@+id/ln_layout"
