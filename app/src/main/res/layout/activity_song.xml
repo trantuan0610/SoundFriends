@@ -14,15 +14,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+
+            <ImageButton
+                android:id="@+id/imgback"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="left"
+                android:layout_marginLeft="25dp"
+                android:layout_marginTop="20dp"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/back"
+                tools:ignore="SpeakableTextPresentCheck" />
+
             <TextView
                 android:id="@+id/txtMusicTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Song title"
-                android:textAllCaps="true"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -63,8 +76,8 @@
                     android:id="@+id/textlike"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="33dp"
                     android:layout_marginLeft="2dp"
+                    android:layout_marginTop="33dp"
                     android:layout_toRightOf="@id/like"
                     android:text="123" />
 
@@ -123,8 +136,8 @@
 
                 <ImageButton
                     android:id="@+id/shuffle"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="20dp"
                     android:background="@null"
@@ -138,42 +151,40 @@
                     android:id="@+id/previous"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/previous"
-                    android:background="@null"
-                    android:layout_toRightOf="@+id/shuffle"
-                    android:textColor="@color/black"
                     android:layout_marginRight="10dp"
-                    android:contentDescription="Previous"/>
+                    android:layout_toRightOf="@+id/shuffle"
+                    android:background="@null"
+                    android:contentDescription="Previous"
+                    android:src="@drawable/previous"
+                    android:textColor="@color/black" />
 
 
                 <ImageButton
                     android:id="@+id/play"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/play"
-                    android:background="@null"
                     android:layout_toRightOf="@+id/previous"
+                    android:background="@null"
                     android:contentDescription="Play or Pause"
+                    android:src="@drawable/play"
                     android:textColor="@color/black" />
-
 
                 <ImageButton
                     android:id="@+id/next"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/next"
-                    android:background="@null"
-                    android:layout_toRightOf="@+id/play"
-                    android:textColor="@color/black"
                     android:layout_marginLeft="10dp"
-                    android:contentDescription="Next"/>
+                    android:layout_toRightOf="@+id/play"
+                    android:background="@null"
+                    android:contentDescription="Next"
+                    android:src="@drawable/next"
+                    android:textColor="@color/black" />
 
                 <ImageButton
-                    android:id="@+id/loop"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:id="@+id/loopBtn"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_centerInParent="true"
-                    android:layout_centerVertical="true"
                     android:layout_marginLeft="20dp"
                     android:layout_toRightOf="@+id/next"
                     android:background="@null"
@@ -184,10 +195,11 @@
                     tools:ignore="TouchTargetSizeCheck" />
 
             </RelativeLayout>
+
             <FrameLayout
                 android:id="@+id/comment_fragment_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
         </LinearLayout>
 
     </ScrollView>

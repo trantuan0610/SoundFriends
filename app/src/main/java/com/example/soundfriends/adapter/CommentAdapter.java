@@ -1,6 +1,7 @@
 package com.example.soundfriends.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,34 +14,49 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.soundfriends.R;
+import com.example.soundfriends.fragments.CommentsFragment;
 import com.example.soundfriends.fragments.Model.Comment;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.android.material.textfield.TextInputEditText;
+
+
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+
 import java.util.concurrent.Callable;
+
+
+import java.util.Locale;
 
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
     private List<Comment> comments;
     private Context context;
+
     private DatabaseReference commentReferences;
-    public CommentAdapter(Context context, List<Comment> comments, DatabaseReference commentReferences) {
+
+    public static final String ACTION_REPLY_BUTTON_CLICK = "action_reply_button_click";
+
+    public CommentAdapter(Context context,List<Comment> comments, DatabaseReference commentReferences) {
         this.context = context;
         this.comments = comments;
         this.commentReferences = commentReferences; // Thêm dòng này
-
     }
 
     @NonNull
@@ -54,11 +70,22 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = comments.get(position);
 
+        //bind item click event
+        handleItemClickHolder(holder, comment);
+
+        String commentTime = comment.getTimestamp();
+
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        LocalDateTime dateTime = LocalDateTime.parse(commentTime, inputFormatter);
+
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy 'lúc' HH:mm");
+        String formattedTime = dateTime.format(outputFormatter);
+
         if(comment == null) return;
 
         holder.tvAccount.setText(comment.getUsername());
         holder.tvBody.setText(comment.getBody());
-        holder.tvTime.setText(comment.getTimestamp());
+        holder.tvTime.setText(formattedTime);
         Glide.with(context).load(Uri.parse(comment.getAvatarUrl())).placeholder(R.drawable.empty_avatar).into(holder.avatarComment);
         holder.tvTextLike.setText(String.valueOf(comment.getLikeCount()));
 
@@ -90,7 +117,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             tvBody = itemView.findViewById(R.id.bodyComment);
             tvTextLike = itemView.findViewById(R.id.textLikeComment);
             btnLikeComment = itemView.findViewById(R.id.likeComment);
-
 
             btnLikeComment.setOnClickListener(v -> onLikeButtonClick(comments.get(getAdapterPosition())));
 
@@ -130,6 +156,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             commentRef.child("likeCount").setValue(comment.getLikeCount());
             commentRef.child("liked").setValue(comment.isLiked());
 
+
+            btnReplyComment = itemView.findViewById(R.id.replyComment);
         }
+    }
+
+    private void handleItemClickHolder(CommentViewHolder holder, Comment model){
+        holder.btnReplyComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent replyIntent = new Intent(ACTION_REPLY_BUTTON_CLICK);
+                replyIntent.putExtra("data", model.getUsername());
+                LocalBroadcastManager.getInstance(view.getContext()).sendBroadcast(replyIntent);
+            }
+        });
     }
 }

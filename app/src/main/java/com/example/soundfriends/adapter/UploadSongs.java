@@ -1,18 +1,23 @@
 package com.example.soundfriends.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -20,10 +25,14 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.soundfriends.R;
 import com.example.soundfriends.Song;
 import com.example.soundfriends.fragments.Model.Songs;
+import com.example.soundfriends.utils.ImageProcessor;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.annotations.Nullable;
 import android.util.Base64;
 import android.widget.Toast;
@@ -57,44 +66,8 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
             holder.artist.setText(model.getArtist());
             holder.category.setText(model.getCategory());
 
-            // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap)
-            String base64Image = model.getUrlImg();
-            // Chuyển đổi chuỗi bitmap thành mảng byte
-            byte[] imageBytes = Base64.decode(base64Image, Base64.DEFAULT);
-
-            // Kiểm tra xem mảng byte có hợp lệ không
-            if (imageBytes == null || imageBytes.length == 0) {
-                Toast.makeText(holder.imageView.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Chuyển đổi mảng byte thành bitmap
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-            // Kiểm tra xem bitmap có hợp lệ không
-            if (bitmap == null) {
-                Toast.makeText(holder.imageView.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Bitmap đã tải xong, hiển thị nó bằng Glide
-            Glide.with(holder.imageView.getContext())
-                    .as(Bitmap.class)
-                    .load(bitmap)
-                    .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
-                    .error(com.google.firebase.database.ktx.R.drawable.common_google_signin_btn_icon_dark_normal)
-                    .circleCrop()
-                    .into(new CustomTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                            holder.imageView.setImageBitmap(resource);
-                        }
-
-                        @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
-                            // Xử lý khi tải bị xóa (nếu cần)
-                        }
-                    });
+            ImageProcessor imageProcessor = new ImageProcessor();
+            imageProcessor.Base64ToImageView(holder.imageView, holder.imageView.getContext(), model.getUrlImg());
         } else {
             holder.itemView.setVisibility(View.GONE);
         }
@@ -111,8 +84,8 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
         return new myViewHolder(view);
     }
 
-    class myViewHolder extends RecyclerView.ViewHolder{
-        ImageButton imgbtn;
+    class myViewHolder extends RecyclerView.ViewHolder {
+        ImageButton btnPopUp;
         ImageView imageView;
 
         TextView title, artist, category, tvsrl;
@@ -125,13 +98,9 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
             title = (TextView) itemView.findViewById(R.id.tv_song);
             artist = (TextView) itemView.findViewById(R.id.tv_artist);
             category = (TextView) itemView.findViewById(R.id.tv_category);
-            imgbtn = (ImageButton) itemView.findViewById(R.id.imgbtn);
+            btnPopUp = (ImageButton) itemView.findViewById(R.id.btn_pop_up);
             tvsrl = (TextView) itemView.findViewById(R.id.tvsrl);
-
-
         }
-
-
     }
 
     private void onClickHolder(myViewHolder holder, Songs model) {
@@ -146,12 +115,59 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
                 // Pass any necessary data to the SongActivity (e.g., selected item data)
                 intent.putExtra("songId", model.getId());
 
-//                System.out.println("========" + model.getId());
-
                 // Start the target Activity
                 context.startActivity(intent);
             }
         });
+        holder.btnPopUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference songRef = getRef(holder.getAbsoluteAdapterPosition());
+                String songRefKey = songRef.getKey();
+
+                //show pop up menu
+                showPopUpMenu(view, model, songRefKey);
+            }
+        });
+    }
+    private void showPopUpMenu(View view, Songs song, String songRefKey){
+        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+        popupMenu.inflate(R.menu.uploaded_songs_popup_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (item.getItemId() == R.id.song_delete_popup){
+                    AlertDialog.Builder alertMergeAccounts = new AlertDialog.Builder(context);
+                    alertMergeAccounts.setTitle("Thông báo");
+                    alertMergeAccounts.setMessage("Bạn có chắc chắn muốn xoá bài hát " + song.title + "?");
+                    alertMergeAccounts.setIcon(R.mipmap.ic_launcher_round);
+                    alertMergeAccounts.setPositiveButton("Xoá", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteSong(songRefKey);
+                        }
+                    });
+                    alertMergeAccounts.setNegativeButton("Huỷ", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    alertMergeAccounts.show();
+
+                    return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
+
+    private void deleteSong(String songRefKey) {
+        DatabaseReference songRef = FirebaseDatabase.getInstance().getReference().child("songs").child(songRefKey);
+        songRef.removeValue();
+
+        notifyDataSetChanged();
     }
 }
 
