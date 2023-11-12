@@ -3,19 +3,29 @@ package com.example.soundfriends.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.example.soundfriends.R;
+import com.example.soundfriends.adapter.UploadSongs;
+import com.example.soundfriends.fragments.Model.Songs;
+import com.example.soundfriends.utils.WrapContentLinearLayoutManager;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SearchFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,6 +35,11 @@ public class SearchFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    RecyclerView recyclerView;
+    UploadSongs uploadSongs;
+
+
 
     public SearchFragment() {
         // Required empty public constructor
@@ -62,6 +77,43 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
+
+        recyclerView =(RecyclerView) view.findViewById(R.id.rcvlist_search);
+        recyclerView.setLayoutManager(new WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+
+
+        // Xây dựng options và thiết lập Adapter
+        FirebaseRecyclerOptions<Songs> options = new FirebaseRecyclerOptions.Builder<Songs>()
+                .setQuery(FirebaseDatabase.getInstance().getReference().child("songs"), Songs.class)
+                .build();
+
+        uploadSongs = new UploadSongs(options);
+        recyclerView.setAdapter(uploadSongs);
+
+
         return view;
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        uploadSongs.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        uploadSongs.stopListening();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

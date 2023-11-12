@@ -4,8 +4,9 @@ public class Comment {
     private String commentId, body, userId, username;
     private int likeCount;
     private String timestamp, songId, avatarUrl;
+    private boolean liked;
 
-    public Comment(String commentId, String body, String userId, int likeCount, String timestamp, String songId, String avatarUrl, String username) {
+    public Comment(String commentId, String body, String userId, int likeCount, String timestamp, String songId, String avatarUrl, String username, boolean isLiked) {
         this.commentId = commentId;
         this.body = body;
         this.userId = userId;
@@ -82,4 +83,13 @@ public class Comment {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
+    }
+
 }

@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,6 +65,14 @@ public class CommentsFragment extends Fragment {
     List<Comment> comments = new ArrayList<>();
     String currentSongId;
     Song songActivity;
+    Callable<Void> onLikeButtonClicked = new Callable<Void>() {
+        @Override
+        public Void call() throws Exception {
+            // Your logic for like button click
+            return null;
+        }
+    };
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -138,7 +147,7 @@ public class CommentsFragment extends Fragment {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         commentReferences = database.getReference("comments");
 
-        commentAdapter = new CommentAdapter(getContext(), comments);
+        commentAdapter = new CommentAdapter(getContext(), comments, commentReferences);
         rcvComment.setAdapter(commentAdapter);
 
         //LOAD COMMENT DATA
@@ -158,10 +167,12 @@ public class CommentsFragment extends Fragment {
                 int likeCount = 0;
                 String avatarUrl = auth.getCurrentUser().getPhotoUrl() != null ? String.valueOf(auth.getCurrentUser().getPhotoUrl()): "";
                 String username = auth.getCurrentUser().getEmail() != null ? auth.getCurrentUser().getEmail() : auth.getCurrentUser().getDisplayName();
-
-                Comment comment = new Comment(commentId,commentBody,userId,likeCount,timestamp, currentSongId, avatarUrl, username);
+                boolean isLiked = false;  // Set the initial value for isLiked
+                Comment comment = new Comment(commentId,commentBody,userId,likeCount,timestamp, currentSongId, avatarUrl, username, isLiked);
                 String uploadId = commentReferences.push().getKey();
+                comment.setCommentId(uploadId); // Gán key vừa được tạo vào Comment object
                 commentReferences.child(uploadId).setValue(comment);
+
 
                 edtComment.setText("");
             }
