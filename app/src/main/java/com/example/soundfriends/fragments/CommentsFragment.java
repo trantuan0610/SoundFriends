@@ -1,9 +1,14 @@
 package com.example.soundfriends.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -139,6 +144,10 @@ public class CommentsFragment extends Fragment {
         //LOAD COMMENT DATA
         getComments();
 
+        //Register BroadcastReceiver to listen Reply comment event
+        LocalBroadcastManager.getInstance(requireContext())
+                .registerReceiver(replyCommentBtnClickReceiver, new IntentFilter(CommentAdapter.ACTION_REPLY_BUTTON_CLICK));
+
         btnSubmitComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -183,4 +192,13 @@ public class CommentsFragment extends Fragment {
             }
         });
     }
+    private BroadcastReceiver replyCommentBtnClickReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String userBeReplied = intent.getStringExtra("data");
+            edtComment.setText("@"+ userBeReplied + " ");
+            edtComment.setSelection(edtComment.getText().length());
+            edtComment.requestFocus();
+        }
+    };
 }

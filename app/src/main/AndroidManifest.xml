@@ -21,18 +21,23 @@
         android:theme="@style/Theme.SoundFriends"
         tools:targetApi="31">
         <activity
+            android:name=".adapter.Main_BestSingersAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".adapter.Main_BestSongsAdapter"
+            android:exported="false" />
+        <activity
             android:name=".adapter.CommentAdapter"
             android:exported="false" />
         <activity
             android:name=".auth.Register"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Song"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".auth.Login"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
