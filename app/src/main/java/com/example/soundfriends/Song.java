@@ -11,12 +11,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -32,6 +34,7 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.soundfriends.adapter.UploadSongs;
 import com.example.soundfriends.fragments.CommentsFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,6 +46,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class Song extends AppCompatActivity implements SensorEventListener {
@@ -52,7 +59,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     private SeekBar seekBar;
     private final Handler handler = new Handler();
     private int currentPosition;
-
+    private boolean loopEnabled = false;
     private String audioURL;
 
     private String songId = "";
@@ -65,6 +72,14 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
     private boolean isShakeEnabled = false;
+    ImageButton loopBtn, back, shuffle;
+    private boolean isLoop, isShuffling = false;
+
+    private boolean isSeeking = false;
+
+    private List<String> originalPlaylist;
+    private List<String> shuffledPlaylist;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +113,23 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             }
         });
 
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                // Handle the completion of a song, e.g., play the next song in the playlist
+                playNextSong();
+            }
+        });
+
+        // Fetch the original playlist from Firebase
+
+        // Set up the shuffle button click listener
+        shuffle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleShuffle();
+            }
+        });
 
     }
 
@@ -208,8 +239,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                         throw new RuntimeException(e);
                     }
                 }
-
-
             }
 
             @Override
@@ -225,6 +254,9 @@ public class Song extends AppCompatActivity implements SensorEventListener {
 
         play = findViewById(R.id.play);
         ImageView imgDownload = findViewById(R.id.btnDownload);
+        ImageButton imgback = findViewById(R.id.imgback);
+        loopBtn = findViewById(R.id.loopBtn);
+        shuffle = findViewById(R.id.shuffle);
 
         play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -273,6 +305,99 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 playPreviousSong();
             }
         });
+
+        imgback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Tạo Intent để chuyển đến Activity mới
+                Intent intent = new Intent(Song.this, UploadSongs.class);
+
+                // Khởi động Activity mới
+                startActivity(intent);
+            }
+        });
+
+        loopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateUI_Loop();
+                if (mediaPlayer != null) {
+                    if (isLoop) {
+                        mediaPlayer.setLooping(false); // Disable loop
+                        isLoop = false;
+                    } else {
+                        mediaPlayer.setLooping(true); // Enable loop
+                        isLoop = true;
+                    }
+                }
+
+            }
+        });
+
+        shuffle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateUI_Shuffle();
+                toggleShuffle();
+            }
+        });
+
+    }
+
+    private void updateUI_Loop() {
+        // Update UI elements based on the shuffling state
+        if (isLoop) {
+            loopBtn.setImageResource(R.drawable.loop);
+        } else {
+            loopBtn.setImageResource(R.drawable.loop_color);
+        }
+    }
+
+    private void updateUI_Shuffle() {
+        // Update UI elements based on the shuffling state
+        if (isShuffling) {
+            shuffle.setImageResource(R.drawable.shuffle);
+        } else {
+            shuffle.setImageResource(R.drawable.shuffle_color);
+        }
+    }
+
+
+    private void toggleShuffle() {
+        isShuffling = !isShuffling;
+
+        if (isShuffling) {
+            // If shuffling is enabled, shuffle the playlist
+            shufflePlaylist();
+        } else {
+            // If shuffling is disabled, reset the playlist to the original order
+            shuffledPlaylist.clear();
+            shuffledPlaylist.addAll(originalPlaylist);
+        }
+
+        // Update UI based on the shuffling state
+        updateUI_Shuffle();
+
+        // Start playing the first song in the shuffled playlist
+       playSong (shuffledPlaylist.get(0));
+    }
+
+    private void playSong(String songUrl) {
+        // Implement the logic to play the specified song using MediaPlayer
+        // Set the data source, prepare, and start the MediaPlayer
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(songUrl);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void shufflePlaylist() {
+        // Shuffle the playlist
+        Collections.shuffle(shuffledPlaylist);
     }
 
     private void playNextSong() {
@@ -347,6 +472,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         DatabaseReference songsRef = FirebaseDatabase.getInstance().getReference().child("songs");
         Query songQuery = songsRef.orderByChild("indexSong").equalTo(next);
         // Truy vấn dữ liệu
+
         songQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
