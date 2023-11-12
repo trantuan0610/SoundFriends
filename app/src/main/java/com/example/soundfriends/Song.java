@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -45,6 +46,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class Song extends AppCompatActivity implements SensorEventListener {
@@ -67,6 +70,11 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
     private boolean isShakeEnabled = false;
+    ImageButton loopBtn, back, shuffle;
+    private boolean isLoop, isShuffling = false;
+
+    private boolean isSeeking = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -228,7 +236,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         play = findViewById(R.id.play);
         ImageView imgDownload = findViewById(R.id.btnDownload);
         ImageButton imgback = findViewById(R.id.imgback);
-        ImageButton loop = findViewById(R.id.loop);
+        loopBtn = findViewById(R.id.loopBtn);
 
         play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,21 +297,31 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             }
         });
 
-        loop.setOnClickListener(new View.OnClickListener() {
+        loopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                updateUI();
                 if (mediaPlayer != null) {
-                    if (loopEnabled) {
+                    if (isLoop) {
                         mediaPlayer.setLooping(false); // Disable loop
-                        loopEnabled = false;
+                        isLoop = false;
                     } else {
                         mediaPlayer.setLooping(true); // Enable loop
-                        loopEnabled = true;
+                        isLoop = true;
                     }
                 }
 
             }
         });
+    }
+
+    private void updateUI() {
+        // Update UI elements based on the shuffling state
+        if (isLoop) {
+            loopBtn.setImageResource(R.drawable.loop);
+        } else {
+            loopBtn.setImageResource(R.drawable.loop_color);
+        }
     }
 
     private void playNextSong() {
