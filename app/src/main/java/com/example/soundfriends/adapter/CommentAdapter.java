@@ -2,6 +2,7 @@ package com.example.soundfriends.adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +20,27 @@ import com.example.soundfriends.R;
 import com.example.soundfriends.fragments.Model.Comment;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
+
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
     private List<Comment> comments;
     private Context context;
-
-    public CommentAdapter(Context context,List<Comment> comments) {
+    private DatabaseReference commentReferences;
+    public CommentAdapter(Context context, List<Comment> comments, DatabaseReference commentReferences) {
         this.context = context;
         this.comments = comments;
+        this.commentReferences = commentReferences; // Thêm dòng này
+
     }
 
     @NonNull
@@ -51,6 +61,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.tvTime.setText(comment.getTimestamp());
         Glide.with(context).load(Uri.parse(comment.getAvatarUrl())).placeholder(R.drawable.empty_avatar).into(holder.avatarComment);
         holder.tvTextLike.setText(String.valueOf(comment.getLikeCount()));
+
+        // Đặt trạng thái nút thích dựa trên trạng thái đã thích của comment
+        int likeDrawableResId = comment.isLiked() ? R.drawable.ic_like_selected : R.drawable.ic_like_unselected;
+
+        // Gọi đúng với chỉ một đối số
+        holder.updateLikeButton(likeDrawableResId, comment.getLikeCount());
     }
 
     @Override
@@ -68,13 +84,52 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         public CommentViewHolder(View itemView) {
             super(itemView);
-
             avatarComment = itemView.findViewById(R.id.avatarComment);
             tvAccount = itemView.findViewById(R.id.accountComment);
             tvTime = itemView.findViewById(R.id.timeComment);
             tvBody = itemView.findViewById(R.id.bodyComment);
             tvTextLike = itemView.findViewById(R.id.textLikeComment);
             btnLikeComment = itemView.findViewById(R.id.likeComment);
+
+
+            btnLikeComment.setOnClickListener(v -> onLikeButtonClick(comments.get(getAdapterPosition())));
+
+        }
+
+
+        private void onLikeButtonClick(Comment comment) {
+            int likeCount = comment.getLikeCount();
+            boolean isLiked = comment.isLiked();
+            if (isLiked==false){
+                isLiked=true;
+            }
+
+            if (isLiked) {
+                likeCount++;
+            }
+
+            // Cập nhật trực tiếp vào đối tượng Comment
+            comment.setLiked(isLiked);
+            comment.setLikeCount(likeCount);
+
+            // Cập nhật giao diện người dùng
+            updateLikeButton(isLiked ? R.drawable.ic_like_selected : R.drawable.ic_like_unselected, likeCount);
+
+            // Cập nhật dữ liệu thích trên Firebase
+            updateLikeDataInFirebase(comment);
+        }
+
+        private void updateLikeButton(int likeDrawableResId, int likeCount) {
+            btnLikeComment.setImageResource(likeDrawableResId);
+            tvTextLike.setText(String.valueOf(likeCount));
+        }
+
+
+        private void updateLikeDataInFirebase(Comment comment) {
+            DatabaseReference commentRef = commentReferences.child(comment.getCommentId());
+            commentRef.child("likeCount").setValue(comment.getLikeCount());
+            commentRef.child("liked").setValue(comment.isLiked());
+
         }
     }
 }
