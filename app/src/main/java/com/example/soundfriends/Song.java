@@ -11,6 +11,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.soundfriends.adapter.UploadSongs;
 import com.example.soundfriends.fragments.CommentsFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,7 +54,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     private SeekBar seekBar;
     private final Handler handler = new Handler();
     private int currentPosition;
-
+    private boolean loopEnabled = false;
     private String audioURL;
 
     private String songId = "";
@@ -225,6 +227,8 @@ public class Song extends AppCompatActivity implements SensorEventListener {
 
         play = findViewById(R.id.play);
         ImageView imgDownload = findViewById(R.id.btnDownload);
+        ImageButton imgback = findViewById(R.id.imgback);
+        ImageButton loop = findViewById(R.id.loop);
 
         play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -271,6 +275,33 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             @Override
             public void onClick(View view) {
                 playPreviousSong();
+            }
+        });
+
+        imgback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Tạo Intent để chuyển đến Activity mới
+                Intent intent = new Intent(Song.this, UploadSongs.class);
+
+                // Khởi động Activity mới
+                startActivity(intent);
+            }
+        });
+
+        loop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mediaPlayer != null) {
+                    if (loopEnabled) {
+                        mediaPlayer.setLooping(false); // Disable loop
+                        loopEnabled = false;
+                    } else {
+                        mediaPlayer.setLooping(true); // Enable loop
+                        loopEnabled = true;
+                    }
+                }
+
             }
         });
     }

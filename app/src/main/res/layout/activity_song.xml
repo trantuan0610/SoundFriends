@@ -16,6 +16,19 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_horizontal">
+
+
+            <ImageButton
+                android:id="@+id/imgback"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/back"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="left"
+                android:layout_marginLeft="25dp"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                tools:ignore="SpeakableTextPresentCheck" />
             <TextView
                 android:id="@+id/txtMusicTitle"
                 android:layout_width="wrap_content"
@@ -122,8 +135,8 @@
 
                 <ImageButton
                     android:id="@+id/shuffle"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="20dp"
                     android:background="@null"
@@ -169,10 +182,9 @@
 
                 <ImageButton
                     android:id="@+id/loop"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_centerInParent="true"
-                    android:layout_centerVertical="true"
                     android:layout_marginLeft="20dp"
                     android:layout_toRightOf="@+id/next"
                     android:background="@null"
