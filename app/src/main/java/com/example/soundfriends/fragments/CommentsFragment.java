@@ -175,6 +175,7 @@ public class CommentsFragment extends Fragment {
 
 
                 edtComment.setText("");
+                edtComment.clearFocus();
             }
         });
 

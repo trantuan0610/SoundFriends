@@ -117,6 +117,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             tvBody = itemView.findViewById(R.id.bodyComment);
             tvTextLike = itemView.findViewById(R.id.textLikeComment);
             btnLikeComment = itemView.findViewById(R.id.likeComment);
+            btnReplyComment = itemView.findViewById(R.id.replyComment);
 
             btnLikeComment.setOnClickListener(v -> onLikeButtonClick(comments.get(getAdapterPosition())));
 
@@ -155,9 +156,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             DatabaseReference commentRef = commentReferences.child(comment.getCommentId());
             commentRef.child("likeCount").setValue(comment.getLikeCount());
             commentRef.child("liked").setValue(comment.isLiked());
-
-
-            btnReplyComment = itemView.findViewById(R.id.replyComment);
         }
     }
 

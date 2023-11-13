@@ -642,7 +642,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             // Kiểm tra nếu gia tốc vượt qua một ngưỡng (đây là ví dụ)
             if (acceleration > 12) {
                 // Xử lý sự kiện lắc, ví dụ: chuyển bài hát
-                Toast.makeText(getApplicationContext(), "xảy ra sự kiện lắc", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "xảy ra sự kiện lắc", Toast.LENGTH_SHORT).show();
                 playNextSong();
             }
         }

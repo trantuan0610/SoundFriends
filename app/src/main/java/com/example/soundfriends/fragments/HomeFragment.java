@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.soundfriends.R;
+import com.example.soundfriends.adapter.Main_BestCategoriesAdapter;
+import com.example.soundfriends.adapter.Main_BestSingersAdapter;
 import com.example.soundfriends.adapter.Main_BestSongsAdapter;
 import com.example.soundfriends.fragments.Model.Comment;
 import com.example.soundfriends.fragments.Model.Songs;
@@ -31,8 +33,10 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
-    RecyclerView rcvBestSongs;
+    RecyclerView rcvBestSongs, rcvBestSingers, rcvBestCategories;
     Main_BestSongsAdapter bestSongsAdapter;
+    Main_BestSingersAdapter bestSingersAdapter;
+    Main_BestCategoriesAdapter bestCategoriesAdapter;
     DatabaseReference databaseReference;
     List<Songs> songs = new ArrayList<>();
 
@@ -83,9 +87,15 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         rcvBestSongs = view.findViewById(R.id.rcv_best_songs);
+        rcvBestSingers = view.findViewById(R.id.rcv_best_singer);
+        rcvBestCategories = view.findViewById(R.id.rcv_best_categories);
 
-        WrapContentLinearLayoutManager wrapContentLinearLayoutManager = new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        rcvBestSongs.setLayoutManager(wrapContentLinearLayoutManager);
+        WrapContentLinearLayoutManager wrapContentLinearLayoutManagerSongs = new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        rcvBestSongs.setLayoutManager(wrapContentLinearLayoutManagerSongs);
+        WrapContentLinearLayoutManager wrapContentLinearLayoutManagerSingers = new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        rcvBestSingers.setLayoutManager(wrapContentLinearLayoutManagerSingers);
+        WrapContentLinearLayoutManager wrapContentLinearLayoutManagerCategories = new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        rcvBestCategories.setLayoutManager(wrapContentLinearLayoutManagerCategories);
 
         //initial realtime DB
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -93,6 +103,10 @@ public class HomeFragment extends Fragment {
 
         bestSongsAdapter = new Main_BestSongsAdapter(getContext(), songs);
         rcvBestSongs.setAdapter(bestSongsAdapter);
+        bestSingersAdapter = new Main_BestSingersAdapter(getContext(), songs);
+        rcvBestSingers.setAdapter(bestSingersAdapter);
+        bestCategoriesAdapter = new Main_BestCategoriesAdapter(getContext(), songs);
+        rcvBestCategories.setAdapter(bestCategoriesAdapter);
 
         getBestSong();
 
@@ -100,9 +114,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void getBestSong() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        databaseReference = database.getReference("songs");
-
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -111,6 +122,8 @@ public class HomeFragment extends Fragment {
                     songs.add(song);
                 }
                 bestSongsAdapter.notifyDataSetChanged();
+                bestSingersAdapter.notifyDataSetChanged();
+                bestCategoriesAdapter.notifyDataSetChanged();
             }
 
             @Override
