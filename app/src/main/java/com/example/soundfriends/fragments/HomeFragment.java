@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.example.soundfriends.R;
 import com.example.soundfriends.adapter.Main_BestCategoriesAdapter;
@@ -17,7 +19,9 @@ import com.example.soundfriends.adapter.Main_BestSingersAdapter;
 import com.example.soundfriends.adapter.Main_BestSongsAdapter;
 import com.example.soundfriends.fragments.Model.Comment;
 import com.example.soundfriends.fragments.Model.Songs;
+import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.example.soundfriends.utils.WrapContentLinearLayoutManager;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +42,9 @@ public class HomeFragment extends Fragment {
     Main_BestSingersAdapter bestSingersAdapter;
     Main_BestCategoriesAdapter bestCategoriesAdapter;
     DatabaseReference databaseReference;
+    ProgressBar pbLoadHome;
     List<Songs> songs = new ArrayList<>();
+    LinearLayout layoutBestSong, layoutBestSinger, layoutBestCategory;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -89,6 +95,10 @@ public class HomeFragment extends Fragment {
         rcvBestSongs = view.findViewById(R.id.rcv_best_songs);
         rcvBestSingers = view.findViewById(R.id.rcv_best_singer);
         rcvBestCategories = view.findViewById(R.id.rcv_best_categories);
+        pbLoadHome = view.findViewById(R.id.pbLoadHome);
+        layoutBestSong = view.findViewById(R.id.layout_best_song);
+        layoutBestSinger = view.findViewById(R.id.layout_best_singer);
+        layoutBestCategory = view.findViewById(R.id.layout_best_category);
 
         WrapContentLinearLayoutManager wrapContentLinearLayoutManagerSongs = new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rcvBestSongs.setLayoutManager(wrapContentLinearLayoutManagerSongs);
@@ -124,6 +134,11 @@ public class HomeFragment extends Fragment {
                 bestSongsAdapter.notifyDataSetChanged();
                 bestSingersAdapter.notifyDataSetChanged();
                 bestCategoriesAdapter.notifyDataSetChanged();
+
+                ToggleShowHideUI.toggleShowUI(false, pbLoadHome);
+                ToggleShowHideUI.toggleShowUI(true, layoutBestSong);
+                ToggleShowHideUI.toggleShowUI(true, layoutBestSinger);
+                ToggleShowHideUI.toggleShowUI(true, layoutBestCategory);
             }
 
             @Override

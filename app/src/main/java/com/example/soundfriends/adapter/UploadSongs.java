@@ -57,7 +57,10 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
     @Override
     protected void onBindViewHolder(@NonNull myViewHolder holder, int position, @NonNull Songs model) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String userIDLogin = currentUser.getUid();
+        String userIDLogin = "";
+        if (currentUser != null){
+            userIDLogin = currentUser.getUid();
+        }
 
         onClickHolder(holder, model);
 

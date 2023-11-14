@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,7 +43,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public class Login extends AppCompatActivity {
     EditText edtEmail, edtPassword;
-    Button btnRegister, btnLogIn;
+    Button btnRegister, btnLogIn, btnForgotPassword;
     ImageView btnLoginWithGoogle;
     FirebaseAuth firebaseAuth;
     ProgressBar pbLoadLogin;
@@ -71,6 +73,7 @@ public class Login extends AppCompatActivity {
         pbLoadLogin = (ProgressBar) findViewById(R.id.pbLoadLogin);
         btnLogIn = (Button) findViewById(R.id.btnLogin);
         btnLoginWithGoogle = (ImageView) findViewById(R.id.logInWithGoogle);
+        btnForgotPassword = findViewById(R.id.btnForgotPassword);
 
         //getFirebaseAuth Instance
         firebaseAuth = FirebaseAuth.getInstance();
@@ -150,6 +153,28 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 Intent GoogleSignInIntent = googleSignInClient.getSignInIntent();
                 activityResultLauncher.launch(GoogleSignInIntent);
+            }
+        });
+
+        btnForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(edtEmail.getText().toString().isEmpty()){
+                    Toast.makeText(Login.this, "Vui lòng nhập Email tài khoản", Toast.LENGTH_SHORT).show();
+                } else handleResetPassword();
+            }
+        });
+    }
+
+    private void handleResetPassword() {
+        ToggleShowHideUI.toggleShowUI(true, pbLoadLogin);
+        firebaseAuth.sendPasswordResetEmail(edtEmail.getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(Login.this, "Đã gửi Email khôi phục mật khẩu. Hãy mở ứng dụng Email", Toast.LENGTH_LONG).show();
+                    ToggleShowHideUI.toggleShowUI(false, pbLoadLogin);
+                } else Toast.makeText(Login.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
