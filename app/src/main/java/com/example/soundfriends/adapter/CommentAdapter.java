@@ -153,7 +153,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
 
         private void updateLikeDataInFirebase(Comment comment) {
-            DatabaseReference commentRef = commentReferences.child(comment.getCommentId());
+            // Assuming commentReferences is a DatabaseReference
+            String commentKey = comment.getCommentId(); // Assuming you have the key
+
+            // Tạo một DatabaseReference đến nút cần thay thế
+            DatabaseReference commentRef = commentReferences.child(commentKey);
+
+            // Đặt giá trị mới cho các trường trong nút cụ thể
             commentRef.child("likeCount").setValue(comment.getLikeCount());
             commentRef.child("liked").setValue(comment.isLiked());
         }
