@@ -26,6 +26,7 @@ import com.example.soundfriends.R;
 import com.example.soundfriends.Song;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.utils.ImageProcessor;
+import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -72,7 +73,7 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
             ImageProcessor imageProcessor = new ImageProcessor();
             imageProcessor.Base64ToImageView(holder.imageView, holder.imageView.getContext(), model.getUrlImg());
         } else {
-            holder.itemView.setVisibility(View.GONE);
+            ToggleShowHideUI.toggleShowUI(false, holder.itemView);
         }
     }
 

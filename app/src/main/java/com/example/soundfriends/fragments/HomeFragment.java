@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -41,9 +42,12 @@ public class HomeFragment extends Fragment {
     Main_BestSongsAdapter bestSongsAdapter;
     Main_BestSingersAdapter bestSingersAdapter;
     Main_BestCategoriesAdapter bestCategoriesAdapter;
-    DatabaseReference databaseReference;
+    FirebaseDatabase database;
+    DatabaseReference songsRef;
     ProgressBar pbLoadHome;
-    List<Songs> songs = new ArrayList<>();
+    List<Songs> bestSongs = new ArrayList<>();
+    List<Songs> bestSingers = new ArrayList<>();
+    List<Songs> bestCategories = new ArrayList<>();
     LinearLayout layoutBestSong, layoutBestSinger, layoutBestCategory;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -108,28 +112,60 @@ public class HomeFragment extends Fragment {
         rcvBestCategories.setLayoutManager(wrapContentLinearLayoutManagerCategories);
 
         //initial realtime DB
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        databaseReference = database.getReference("songs");
+        database = FirebaseDatabase.getInstance();
 
-        bestSongsAdapter = new Main_BestSongsAdapter(getContext(), songs);
+        //set adapter
+        bestSongsAdapter = new Main_BestSongsAdapter(getContext(), bestSongs);
         rcvBestSongs.setAdapter(bestSongsAdapter);
-        bestSingersAdapter = new Main_BestSingersAdapter(getContext(), songs);
+        bestSingersAdapter = new Main_BestSingersAdapter(getContext(), bestSingers);
         rcvBestSingers.setAdapter(bestSingersAdapter);
-        bestCategoriesAdapter = new Main_BestCategoriesAdapter(getContext(), songs);
+        bestCategoriesAdapter = new Main_BestCategoriesAdapter(getContext(), bestCategories);
         rcvBestCategories.setAdapter(bestCategoriesAdapter);
 
-        getBestSong();
+        //get data from Firebase
+        getData();
 
         return view;
     }
 
-    private void getBestSong() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
+    private void getData() {
+        //get best songs
+        songsRef = database.getReference("songs");
+        songsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshotItem: snapshot.getChildren()){
+                    //best song
                     Songs song = dataSnapshotItem.getValue(Songs.class);
-                    songs.add(song);
+                    bestSongs.add(song);
+
+                    //best singer
+                    String currentSinger = dataSnapshotItem.child("artist").getValue(String.class);
+                    Boolean containsSinger = false;
+                    for(Songs songArtist : bestSingers){
+                        if (songArtist.getArtist().equals(currentSinger)){
+                            containsSinger = true;
+                            break;
+                        }
+                    }
+                    if (!containsSinger){
+                        Songs songArtist = dataSnapshotItem.getValue(Songs.class);
+                        bestSingers.add(songArtist);
+                    }
+
+                    //best category
+                    String currentCategory = dataSnapshotItem.child("category").getValue(String.class);
+                    Boolean containsCategory = false;
+                    for(Songs songCategory : bestCategories){
+                        if (songCategory.getCategory().equals(currentCategory)){
+                            containsCategory = true;
+                            break;
+                        }
+                    }
+                    if (!containsCategory){
+                        Songs songCategory = dataSnapshotItem.getValue(Songs.class);
+                        bestCategories.add(songCategory);
+                    }
                 }
                 bestSongsAdapter.notifyDataSetChanged();
                 bestSingersAdapter.notifyDataSetChanged();

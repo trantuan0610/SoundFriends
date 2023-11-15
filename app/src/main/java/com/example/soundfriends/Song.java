@@ -36,6 +36,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.soundfriends.adapter.UploadSongs;
 import com.example.soundfriends.fragments.CommentsFragment;
+import com.example.soundfriends.utils.ImageProcessor;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -176,43 +177,8 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                     ImageView imgSong = findViewById(R.id.imgsong);
 
 
-                    // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap)
-                    String base64Image = imgUrl;
-                    // Chuyển đổi chuỗi bitmap thành mảng byte
-                    byte[] imageBytes = Base64.decode(base64Image, Base64.DEFAULT);
-
-                    // Kiểm tra xem mảng byte có hợp lệ không
-                    if (imageBytes == null) {
-                        Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    // Chuyển đổi mảng byte thành bitmap
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-//
-//                    // Kiểm tra xem bitmap có hợp lệ không
-//                    if (bitmap == null) {
-//                        Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-
-                    // Bitmap đã tải xong, hiển thị nó bằng Glide
-                    Glide.with(imgSong.getContext())
-                            .as(Bitmap.class)
-                            .load(bitmap)
-                            .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
-                            .error(com.google.firebase.database.ktx.R.drawable.common_google_signin_btn_icon_dark_normal)
-                            .into(new CustomTarget<Bitmap>() {
-                                @Override
-                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                    imgSong.setImageBitmap(resource);
-                                }
-
-                                @Override
-                                public void onLoadCleared(@Nullable Drawable placeholder) {
-                                    // Xử lý khi tải bị xóa (nếu cần)
-                                }
-                            });
+                    // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap) và hiển thị ảnh
+                    ImageProcessor.Base64ToImageView(imgSong, imgSong.getContext(), imgUrl);
 
 
                     try {
@@ -496,43 +462,8 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                     //update comment per song
                     sendDataToFragment(songSnapshot.child("id").getValue(String.class));
 
-                    // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap)
-                    String base64Image = imgUrl;
-                    // Chuyển đổi chuỗi bitmap thành mảng byte
-                    byte[] imageBytes = Base64.decode(base64Image, Base64.DEFAULT);
-
-                    // Kiểm tra xem mảng byte có hợp lệ không
-                    if (imageBytes == null || imageBytes.length == 0) {
-                        Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    // Chuyển đổi mảng byte thành bitmap
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-                    // Kiểm tra xem bitmap có hợp lệ không
-                    if (bitmap == null) {
-                        Toast.makeText(imgSong.getContext(), "Không thể xử lý chuỗi", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    // Bitmap đã tải xong, hiển thị nó bằng Glide
-                    Glide.with(imgSong.getContext())
-                            .as(Bitmap.class)
-                            .load(bitmap)
-                            .placeholder(com.firebase.ui.database.R.drawable.common_google_signin_btn_icon_dark)
-                            .error(com.google.firebase.database.ktx.R.drawable.common_google_signin_btn_icon_dark_normal)
-                            .into(new CustomTarget<Bitmap>() {
-                                @Override
-                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                    imgSong.setImageBitmap(resource);
-                                }
-
-                                @Override
-                                public void onLoadCleared(@Nullable Drawable placeholder) {
-                                    // Xử lý khi tải bị xóa (nếu cần)
-                                }
-                            });
+                    // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap) và hiển thị ảnh
+                    ImageProcessor.Base64ToImageView(imgSong, imgSong.getContext(), imgUrl);
 
                     try {
                         // ... (Các bước khác để chuẩn bị bài hát mới)
@@ -606,9 +537,10 @@ public class Song extends AppCompatActivity implements SensorEventListener {
 
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setTitle("My Audio");
-        request.setDescription("Downloading audio...");
+        request.setDescription("Đang tải nhạc xuống...");
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "my_audio.mp3");
+        Toast.makeText(this, "Đang tải nhạc xuống...", Toast.LENGTH_SHORT).show();
 
         DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         long downloadId = downloadManager.enqueue(request);

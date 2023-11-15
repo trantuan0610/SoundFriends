@@ -131,6 +131,7 @@
                         android:layout_marginLeft="10dp"
                         android:contentDescription="#000"
                         android:text="Chưa chọn file audio"
+                        android:hint="Chưa chọn file audio"
                         android:textColor="@color/black" />
                 </LinearLayout>
                 <Button
@@ -140,8 +141,18 @@
                     android:layout_marginTop="10dp"
                     android:text="Bắt đầu tải lên"
                     android:textStyle="bold"
+                    android:textColor="@color/black"
                     android:layout_below="@+id/ln_layout"
-                    ></Button>
+                    />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btn_cancel_upload"
+                    android:layout_marginTop="10dp"
+                    android:text="Huỷ"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/buttonUplaod"
+                    />
             </RelativeLayout>
 
             <TextView
@@ -156,12 +167,6 @@
                 android:layout_below="@id/rl_layout"
                 />
 
-            <ProgressBar
-                android:id="@+id/rcvProgressBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_uploaded_song" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rcvlist_song_uploaded"
                 android:layout_width="match_parent"
@@ -175,7 +180,12 @@
                 />
         </RelativeLayout>
     </ScrollView>
-
+    <ProgressBar
+        android:id="@+id/rcvProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"/>
     <Button
         android:id="@+id/logout"
         android:layout_width="wrap_content"
@@ -185,4 +195,13 @@
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="20dp"
         android:text="Đăng xuất" />
+
+    <Button
+        android:id="@+id/login_in_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:text="Đăng nhập để quản lý nhạc cá nhân" />
 </FrameLayout>

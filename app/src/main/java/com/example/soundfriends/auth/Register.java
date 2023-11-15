@@ -5,10 +5,8 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -19,24 +17,18 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.soundfriends.MainActivity;
 import com.example.soundfriends.R;
 import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.example.soundfriends.utils.validator;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthCredential;
-import com.google.firebase.auth.GoogleAuthProvider;
 
 public class Register extends AppCompatActivity {
     EditText edtEmail, edtPassword, edtPassword2;
@@ -54,8 +46,7 @@ public class Register extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if(currentUser != null){
-            sharedAuthMethods sharedAuthMethods = new sharedAuthMethods();
-            sharedAuthMethods.goHomeActivity(Register.this);
+            SharedAuthMethods.goHomeActivity(Register.this);
         }
     }
 
@@ -113,8 +104,7 @@ public class Register extends AppCompatActivity {
                                     // If sign in success, display a message to the user.
                                     Toast.makeText(Register.this, "Đăng ký thành công",
                                             Toast.LENGTH_SHORT).show();
-                                    sharedAuthMethods sharedAuthMethods = new sharedAuthMethods();
-                                    sharedAuthMethods.goHomeActivity(Register.this);
+                                    SharedAuthMethods.goHomeActivity(Register.this);
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     FirebaseAuthException exception = (FirebaseAuthException) task.getException();
@@ -143,7 +133,7 @@ public class Register extends AppCompatActivity {
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {
-                    sharedAuthMethods sharedAuthMethods = new sharedAuthMethods();
+                    SharedAuthMethods sharedAuthMethods = new SharedAuthMethods();
                     sharedAuthMethods.GoogleIntentLauncher(result, Register.this, pbLoadRegister, firebaseAuth, googleSignInClient);
             }
         });
