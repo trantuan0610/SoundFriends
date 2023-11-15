@@ -5,10 +5,8 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,28 +18,22 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.soundfriends.MainActivity;
 import com.example.soundfriends.R;
 import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.example.soundfriends.utils.validator;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthCredential;
-import com.google.firebase.auth.GoogleAuthProvider;
 
 public class Login extends AppCompatActivity {
     EditText edtEmail, edtPassword;
-    Button btnRegister, btnLogIn;
+    Button btnRegister, btnLogIn, btnForgotPassword;
     ImageView btnLoginWithGoogle;
     FirebaseAuth firebaseAuth;
     ProgressBar pbLoadLogin;
@@ -55,8 +47,7 @@ public class Login extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if(currentUser != null){
-            sharedAuthMethods sharedAuthMethods = new sharedAuthMethods();
-            sharedAuthMethods.goHomeActivity(Login.this);
+            SharedAuthMethods.goHomeActivity(Login.this);
         }
     }
 
@@ -71,6 +62,7 @@ public class Login extends AppCompatActivity {
         pbLoadLogin = (ProgressBar) findViewById(R.id.pbLoadLogin);
         btnLogIn = (Button) findViewById(R.id.btnLogin);
         btnLoginWithGoogle = (ImageView) findViewById(R.id.logInWithGoogle);
+        btnForgotPassword = findViewById(R.id.btnForgotPassword);
 
         //getFirebaseAuth Instance
         firebaseAuth = FirebaseAuth.getInstance();
@@ -109,8 +101,7 @@ public class Login extends AppCompatActivity {
                                     Toast.makeText(Login.this, "Đăng nhập thành công",
                                             Toast.LENGTH_SHORT).show();
                                     //goHome Intent
-                                    sharedAuthMethods sharedAuthMethods = new sharedAuthMethods();
-                                    sharedAuthMethods.goHomeActivity(Login.this);
+                                    SharedAuthMethods.goHomeActivity(Login.this);
                                 }
                                 else {
                                     // If sign in fails, display a message to the user.
@@ -140,7 +131,7 @@ public class Login extends AppCompatActivity {
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {
-                sharedAuthMethods sharedAuthMethods = new sharedAuthMethods();
+                SharedAuthMethods sharedAuthMethods = new SharedAuthMethods();
                 sharedAuthMethods.GoogleIntentLauncher(result, Login.this, pbLoadLogin, firebaseAuth, googleSignInClient);
             }
         });
@@ -150,6 +141,28 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 Intent GoogleSignInIntent = googleSignInClient.getSignInIntent();
                 activityResultLauncher.launch(GoogleSignInIntent);
+            }
+        });
+
+        btnForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(edtEmail.getText().toString().isEmpty()){
+                    Toast.makeText(Login.this, "Vui lòng nhập Email tài khoản", Toast.LENGTH_SHORT).show();
+                } else handleResetPassword();
+            }
+        });
+    }
+
+    private void handleResetPassword() {
+        ToggleShowHideUI.toggleShowUI(true, pbLoadLogin);
+        firebaseAuth.sendPasswordResetEmail(edtEmail.getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(Login.this, "Đã gửi Email khôi phục mật khẩu. Hãy mở ứng dụng Email", Toast.LENGTH_LONG).show();
+                    ToggleShowHideUI.toggleShowUI(false, pbLoadLogin);
+                } else Toast.makeText(Login.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

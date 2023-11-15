@@ -18,7 +18,7 @@ import com.example.soundfriends.R;
 import com.google.firebase.database.annotations.Nullable;
 
 public class ImageProcessor {
-    public void Base64ToImageView(ImageView imageView, Context context, String base64Image){
+    public static void Base64ToImageView(ImageView imageView, Context context, String base64Image){
         // Lấy chuỗi bitmap từ Firebase (giả sử 'model.getUrlImg()' chứa chuỗi bitmap)
 
         // Chuyển đổi chuỗi bitmap thành mảng byte

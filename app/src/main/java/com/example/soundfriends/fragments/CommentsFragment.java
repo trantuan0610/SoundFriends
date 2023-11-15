@@ -13,27 +13,28 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.soundfriends.R;
 import com.example.soundfriends.Song;
 import com.example.soundfriends.adapter.CommentAdapter;
+import com.example.soundfriends.auth.SharedAuthMethods;
 import com.example.soundfriends.fragments.Model.Comment;
+import com.example.soundfriends.utils.ToggleInputFocus;
+import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.example.soundfriends.utils.WrapContentLinearLayoutManager;
 import com.example.soundfriends.utils.uuid;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,10 +42,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -54,6 +53,8 @@ import java.util.concurrent.Callable;
  * create an instance of this fragment.
  */
 public class CommentsFragment extends Fragment {
+    RelativeLayout layoutInputComment;
+    Button loginInComment;
     ImageView currentAvatarComment;
     TextInputLayout commentInputLayout;
     TextInputEditText edtComment;
@@ -125,6 +126,8 @@ public class CommentsFragment extends Fragment {
         songActivity = (Song) getActivity();
         currentSongId = getArguments().getString("key_song_id");
 
+        layoutInputComment = view.findViewById(R.id.layoutInputComment);
+        loginInComment = view.findViewById(R.id.login_in_comment);
         rcvComment = view.findViewById(R.id.rcvComments);
         currentAvatarComment = view.findViewById(R.id.currentAvatarComment);
         commentInputLayout = (TextInputLayout) view.findViewById(R.id.edtComment);
@@ -133,9 +136,15 @@ public class CommentsFragment extends Fragment {
 
         //load current user information to comment input set
         FirebaseUser user = auth.getCurrentUser();
-        Glide.with(this).load(user.getPhotoUrl()).into(currentAvatarComment);
-        String username = user.getEmail() != null ? user.getEmail() : user.getDisplayName();
-        commentInputLayout.setHint("Bình luận với tư cách "+ username);
+
+        if (user != null){
+            Glide.with(this).load(user.getPhotoUrl()).into(currentAvatarComment);
+            String username = user.getEmail() != null ? user.getEmail() : user.getDisplayName();
+            commentInputLayout.setHint("Bình luận với tư cách "+ username);
+        } else {
+            ToggleShowHideUI.toggleShowUI(false, layoutInputComment);
+            ToggleShowHideUI.toggleShowUI(true, loginInComment);
+        }
 
         //initial recycler view
         rcvComment.setLayoutManager(new WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
@@ -160,22 +169,30 @@ public class CommentsFragment extends Fragment {
         btnSubmitComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String commentBody = edtComment.getText().toString().trim();
-                String commentId = uuid.createTransactionID();
-                String userId = auth.getCurrentUser().getUid();
-                String timestamp = Calendar.getInstance().getTime().toString();
-                int likeCount = 0;
-                String avatarUrl = auth.getCurrentUser().getPhotoUrl() != null ? String.valueOf(auth.getCurrentUser().getPhotoUrl()): "";
-                String username = auth.getCurrentUser().getEmail() != null ? auth.getCurrentUser().getEmail() : auth.getCurrentUser().getDisplayName();
-                boolean isLiked = false;  // Set the initial value for isLiked
-                Comment comment = new Comment(commentId,commentBody,userId,likeCount,timestamp, currentSongId, avatarUrl, username, isLiked);
-                String uploadId = commentReferences.push().getKey();
-                comment.setCommentId(uploadId); // Gán key vừa được tạo vào Comment object
-                commentReferences.child(uploadId).setValue(comment);
-
+                if (!edtComment.getText().toString().trim().isEmpty()){
+                    String commentBody = edtComment.getText().toString().trim();
+                    String commentId = uuid.createTransactionID();
+                    String userId = auth.getCurrentUser().getUid();
+                    String timestamp = Calendar.getInstance().getTime().toString();
+                    int likeCount = 0;
+                    String avatarUrl = auth.getCurrentUser().getPhotoUrl() != null ? String.valueOf(auth.getCurrentUser().getPhotoUrl()): "";
+                    String username = auth.getCurrentUser().getEmail() != null ? auth.getCurrentUser().getEmail() : auth.getCurrentUser().getDisplayName();
+                    boolean isLiked = false;  // Set the initial value for isLiked
+                    Comment comment = new Comment(commentId,commentBody,userId,likeCount,timestamp, currentSongId, avatarUrl, username, isLiked);
+                    String uploadId = commentReferences.push().getKey();
+                    comment.setCommentId(uploadId); // Gán key vừa được tạo vào Comment object
+                    commentReferences.child(uploadId).setValue(comment);
+                }
 
                 edtComment.setText("");
-                edtComment.clearFocus();
+                ToggleInputFocus.unfocusAndHideKeyboard(getContext(), edtComment);
+            }
+        });
+
+        loginInComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedAuthMethods.goLoginActivity(getContext());
             }
         });
 
@@ -204,6 +221,7 @@ public class CommentsFragment extends Fragment {
             }
         });
     }
+
     private BroadcastReceiver replyCommentBtnClickReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

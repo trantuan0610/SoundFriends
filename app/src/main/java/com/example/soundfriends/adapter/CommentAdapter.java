@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.example.soundfriends.R;
 import com.example.soundfriends.fragments.CommentsFragment;
 import com.example.soundfriends.fragments.Model.Comment;
+import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 
@@ -119,7 +120,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             btnLikeComment = itemView.findViewById(R.id.likeComment);
             btnReplyComment = itemView.findViewById(R.id.replyComment);
 
-            btnLikeComment.setOnClickListener(v -> onLikeButtonClick(comments.get(getAdapterPosition())));
+            if (FirebaseAuth.getInstance().getCurrentUser() == null){
+                ToggleShowHideUI.toggleShowUI(false, btnReplyComment);
+            } else btnLikeComment.setOnClickListener(v -> onLikeButtonClick(comments.get(getAbsoluteAdapterPosition())));
 
         }
 

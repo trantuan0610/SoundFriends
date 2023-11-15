@@ -1,11 +1,8 @@
 package com.example.soundfriends.auth;
 
-import static android.app.Activity.RESULT_OK;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,7 +18,6 @@ import com.example.soundfriends.utils.validator;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -30,7 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthCredential;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class sharedAuthMethods extends AppCompatActivity {
+public class SharedAuthMethods extends AppCompatActivity {
     public void GoogleIntentLauncher(ActivityResult result, Context context, View pbLoading, FirebaseAuth firebaseAuth, GoogleSignInClient googleSignInClient) {
         if (result.getResultCode() == RESULT_OK){
             ToggleShowHideUI.toggleShowUI(true, pbLoading);
@@ -88,8 +84,13 @@ public class sharedAuthMethods extends AppCompatActivity {
                 });
     }
 
-    public void goHomeActivity(Context context) {
+    public static void goHomeActivity(Context context) {
         Intent MainActivityIntent = new Intent(context, MainActivity.class);
         context.startActivity(MainActivityIntent);
+    }
+
+    public static void goLoginActivity(Context context){
+        Intent LoginIntent = new Intent(context, Login.class);
+        context.startActivity(LoginIntent);
     }
 }

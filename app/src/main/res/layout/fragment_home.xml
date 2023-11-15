@@ -12,55 +12,67 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <ProgressBar
+                android:id="@+id/pbLoadHome"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="50dp"/>
             <LinearLayout
+                android:id="@+id/layout_best_song"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
                 <TextView
                     android:layout_marginBottom="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Lựa chọn của SoundFriends"
                     android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textSize="22sp"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcv_best_songs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/layout_best_singer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
                 <TextView
                     android:layout_marginBottom="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ca sĩ nổi tiếng gần đây"
                     android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textSize="22sp"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/rcv_best_singer"/>
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/layout_best_category"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
                 <TextView
                     android:layout_marginBottom="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thể loại bạn có thể thích"
                     android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textSize="22sp"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcv_best_categories"
                     android:layout_width="wrap_content"

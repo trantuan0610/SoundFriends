@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.example.soundfriends.R;
 import com.example.soundfriends.adapter.Main_BestCategoriesAdapter;
@@ -17,11 +19,14 @@ import com.example.soundfriends.adapter.Main_BestSingersAdapter;
 import com.example.soundfriends.adapter.Main_BestSongsAdapter;
 import com.example.soundfriends.fragments.Model.Comment;
 import com.example.soundfriends.fragments.Model.Songs;
+import com.example.soundfriends.utils.ToggleShowHideUI;
 import com.example.soundfriends.utils.WrapContentLinearLayoutManager;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -37,8 +42,13 @@ public class HomeFragment extends Fragment {
     Main_BestSongsAdapter bestSongsAdapter;
     Main_BestSingersAdapter bestSingersAdapter;
     Main_BestCategoriesAdapter bestCategoriesAdapter;
-    DatabaseReference databaseReference;
-    List<Songs> songs = new ArrayList<>();
+    FirebaseDatabase database;
+    DatabaseReference songsRef;
+    ProgressBar pbLoadHome;
+    List<Songs> bestSongs = new ArrayList<>();
+    List<Songs> bestSingers = new ArrayList<>();
+    List<Songs> bestCategories = new ArrayList<>();
+    LinearLayout layoutBestSong, layoutBestSinger, layoutBestCategory;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -89,6 +99,10 @@ public class HomeFragment extends Fragment {
         rcvBestSongs = view.findViewById(R.id.rcv_best_songs);
         rcvBestSingers = view.findViewById(R.id.rcv_best_singer);
         rcvBestCategories = view.findViewById(R.id.rcv_best_categories);
+        pbLoadHome = view.findViewById(R.id.pbLoadHome);
+        layoutBestSong = view.findViewById(R.id.layout_best_song);
+        layoutBestSinger = view.findViewById(R.id.layout_best_singer);
+        layoutBestCategory = view.findViewById(R.id.layout_best_category);
 
         WrapContentLinearLayoutManager wrapContentLinearLayoutManagerSongs = new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rcvBestSongs.setLayoutManager(wrapContentLinearLayoutManagerSongs);
@@ -98,32 +112,69 @@ public class HomeFragment extends Fragment {
         rcvBestCategories.setLayoutManager(wrapContentLinearLayoutManagerCategories);
 
         //initial realtime DB
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        databaseReference = database.getReference("songs");
+        database = FirebaseDatabase.getInstance();
 
-        bestSongsAdapter = new Main_BestSongsAdapter(getContext(), songs);
+        //set adapter
+        bestSongsAdapter = new Main_BestSongsAdapter(getContext(), bestSongs);
         rcvBestSongs.setAdapter(bestSongsAdapter);
-        bestSingersAdapter = new Main_BestSingersAdapter(getContext(), songs);
+        bestSingersAdapter = new Main_BestSingersAdapter(getContext(), bestSingers);
         rcvBestSingers.setAdapter(bestSingersAdapter);
-        bestCategoriesAdapter = new Main_BestCategoriesAdapter(getContext(), songs);
+        bestCategoriesAdapter = new Main_BestCategoriesAdapter(getContext(), bestCategories);
         rcvBestCategories.setAdapter(bestCategoriesAdapter);
 
-        getBestSong();
+        //get data from Firebase
+        getData();
 
         return view;
     }
 
-    private void getBestSong() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
+    private void getData() {
+        //get best songs
+        songsRef = database.getReference("songs");
+        songsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshotItem: snapshot.getChildren()){
+                    //best song
                     Songs song = dataSnapshotItem.getValue(Songs.class);
-                    songs.add(song);
+                    bestSongs.add(song);
+
+                    //best singer
+                    String currentSinger = dataSnapshotItem.child("artist").getValue(String.class);
+                    Boolean containsSinger = false;
+                    for(Songs songArtist : bestSingers){
+                        if (songArtist.getArtist().equals(currentSinger)){
+                            containsSinger = true;
+                            break;
+                        }
+                    }
+                    if (!containsSinger){
+                        Songs songArtist = dataSnapshotItem.getValue(Songs.class);
+                        bestSingers.add(songArtist);
+                    }
+
+                    //best category
+                    String currentCategory = dataSnapshotItem.child("category").getValue(String.class);
+                    Boolean containsCategory = false;
+                    for(Songs songCategory : bestCategories){
+                        if (songCategory.getCategory().equals(currentCategory)){
+                            containsCategory = true;
+                            break;
+                        }
+                    }
+                    if (!containsCategory){
+                        Songs songCategory = dataSnapshotItem.getValue(Songs.class);
+                        bestCategories.add(songCategory);
+                    }
                 }
                 bestSongsAdapter.notifyDataSetChanged();
                 bestSingersAdapter.notifyDataSetChanged();
                 bestCategoriesAdapter.notifyDataSetChanged();
+
+                ToggleShowHideUI.toggleShowUI(false, pbLoadHome);
+                ToggleShowHideUI.toggleShowUI(true, layoutBestSong);
+                ToggleShowHideUI.toggleShowUI(true, layoutBestSinger);
+                ToggleShowHideUI.toggleShowUI(true, layoutBestCategory);
             }
 
             @Override

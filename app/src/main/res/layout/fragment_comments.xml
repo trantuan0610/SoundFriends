@@ -23,7 +23,19 @@
             android:textSize="18dp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/login_in_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:text="Đăng nhập để có thể bình luận"
+            android:textColor="@color/black"
+            android:visibility="gone"/>
+
         <RelativeLayout
+            android:id="@+id/layoutInputComment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"

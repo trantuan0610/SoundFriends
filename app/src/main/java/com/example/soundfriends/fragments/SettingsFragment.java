@@ -12,6 +12,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,12 +31,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.soundfriends.R;
 import com.example.soundfriends.auth.Login;
+import com.example.soundfriends.auth.SharedAuthMethods;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.adapter.UploadSongs;
 import com.example.soundfriends.utils.ToggleShowHideUI;
@@ -68,7 +71,7 @@ import java.io.ByteArrayOutputStream;
  * create an instance of this fragment.
  */
 public class SettingsFragment extends Fragment  implements AdapterView.OnItemSelectedListener {
-
+    ScrollView scrollViewSettings;
     TextView textViewImage;
     ProgressBar progressBar, rcvProgressBar;
     RelativeLayout rlUploadingSong;
@@ -97,7 +100,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
     FirebaseUser user;
     TextView textView;
     ImageView settingsAvatar;
-    Button btnLogout, btnUpload, buttonUpload;
+    Button btnLogout, btnUpload, btnCancelUpload, buttonUpload, btnLogin;
     Bitmap bitmap;
     int songIndex;
 
@@ -145,10 +148,13 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
+        scrollViewSettings = view.findViewById(R.id.scrView);
         textView = view.findViewById(R.id.textView);
         btnLogout = view.findViewById(R.id.logout);
+        btnLogin = view.findViewById(R.id.login_in_settings);
         settingsAvatar = view.findViewById(R.id.settingsAvatar);
 
+        btnCancelUpload = view.findViewById(R.id.btn_cancel_upload);
         textViewImage = view.findViewById(R.id.tvsrl);
         progressBar = view.findViewById(R.id.progressbar);
         rlUploadingSong = view.findViewById(R.id.rl_layout);
@@ -159,14 +165,14 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         rcvlist_song_uploaded = view.findViewById(R.id.rcvlist_song_uploaded);
         rcvProgressBar = view.findViewById(R.id.rcvProgressBar);
 
-//        rcvlist_song_uploaded.setLayoutManager(new LinearLayoutManager(requireContext()));
         rcvlist_song_uploaded.setLayoutManager(new WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
-
         if(user == null) {
-            goAuthActivity();
-            Toast.makeText(getContext(), "Vui lòng đăng nhập để sử dụng tính năng này", Toast.LENGTH_LONG).show();
+            ToggleShowHideUI.toggleShowUI(false, scrollViewSettings);
+            ToggleShowHideUI.toggleShowUI(false, btnLogout);
+            ToggleShowHideUI.toggleShowUI(false, rcvProgressBar);
         }else {
+            ToggleShowHideUI.toggleShowUI(false, btnLogin);
             userID = user.getUid();
             String info = user.getEmail() != null ? user.getEmail() : user.getDisplayName();
             textView.setText("Xin chào " + info);
@@ -180,7 +186,7 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             @Override
             public void onClick(View v) {
                 auth.signOut();
-                goAuthActivity();
+                SharedAuthMethods.goLoginActivity(getContext());
             }
         });
 
@@ -196,7 +202,20 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
         uploadSongs = new UploadSongs(options);
         rcvlist_song_uploaded.setAdapter(uploadSongs);
-        ToggleShowHideUI.toggleShowUI(false, rcvProgressBar);
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    ToggleShowHideUI.toggleShowUI(false, rcvProgressBar);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         metadataRetriever = new MediaMetadataRetriever();
         referenceSongs = FirebaseDatabase.getInstance().getReference().child("songs");
@@ -204,7 +223,14 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
 
         buttonUpload = view.findViewById(R.id.buttonUplaod);
         btnUpload = view.findViewById(R.id.bt_upload);
+        btnLogin = view.findViewById(R.id.login_in_settings);
 
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedAuthMethods.goLoginActivity(getContext());
+            }
+        });
 
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,6 +243,19 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
             @Override
             public void onClick(View view) {
                 uploadFileToFirebase(view);
+            }
+        });
+
+        btnCancelUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ToggleShowHideUI.toggleShowUI(false, rlUploadingSong);
+
+                Glide.with(view).load("").placeholder(R.mipmap.ic_launcher_background).into(imageView);
+                title.setText("");
+                artist.setText("");
+                category.setText("");
+                textViewImage.setText("");
             }
         });
 
@@ -251,12 +290,6 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
         });
 
         return view;
-    }
-
-    private void goAuthActivity(){
-        Intent unauthIntent = new Intent(getContext(), Login.class);
-        startActivity(unauthIntent);
-        getActivity().finish();
     }
 
     @Override
@@ -427,8 +460,8 @@ public class SettingsFragment extends Fragment  implements AdapterView.OnItemSel
                 @Override
                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
 
-                    double progess = (100.0* taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
-                    progressBar.setProgress((int) progess);
+                    double progress = (100.0* taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
+                    progressBar.setProgress((int) progress);
 
                 }
             });
