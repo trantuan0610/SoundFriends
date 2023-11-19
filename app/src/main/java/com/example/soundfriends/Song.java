@@ -1,5 +1,6 @@
 package com.example.soundfriends;
 
+import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,6 +50,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -68,18 +71,12 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     int songIndex;
     long songCount;
     ImageButton next, previous, play, pause;
-
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
     private boolean isShakeEnabled = false;
-    ImageButton loopBtn, back, shuffle;
+    ImageButton loopBtn, imgback, shuffle, imgDownload;
     private boolean isLoop, isShuffling = false;
-
     private boolean isSeeking = false;
-
-    private List<String> originalPlaylist;
-    private List<String> shuffledPlaylist;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +87,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         //send song id to load comment of that song
         sendDataToFragment(songId);
 
-        //click on/off sensor shake
 
         imageView = findViewById(R.id.phonering);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -100,6 +96,51 @@ public class Song extends AppCompatActivity implements SensorEventListener {
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        seekBar = findViewById(R.id.seekbar);
+
+        //update seekBar
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    // Update MediaPlayer position when the user slides the SeekBar
+                    mediaPlayer.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // When the user starts sliding the SeekBar, set the flag
+                isSeeking = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // When the user stops sliding the SeekBar, unset the flag
+                isSeeking = false;
+            }
+        });
+
+        // Set up a timer to update the SeekBar while the music is playing
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (mediaPlayer != null && !isSeeking) {
+                    int currentPosition = mediaPlayer.getCurrentPosition();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Update the SeekBar position
+                            seekBar.setProgress(currentPosition);
+                        }
+                    });
+                }
+            }
+        }, 0, 1000); // Update every 1 second (adjust as needed)
+
 
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,17 +161,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 playNextSong();
             }
         });
-
         // Fetch the original playlist from Firebase
-
-        // Set up the shuffle button click listener
-        shuffle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleShuffle();
-            }
-        });
-
     }
 
     private void getData() {
@@ -218,8 +249,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                     try {
                         mediaPlayer.setDataSource(srl);
                         mediaPlayer.prepare();
-
-                        seekBar = findViewById(R.id.seekbar);
                         seekBar.setMax(mediaPlayer.getDuration());
 
                         final Runnable updateSeekBar = new Runnable() {
@@ -238,6 +267,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                    playMusic();
                 }
             }
 
@@ -253,32 +283,43 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
         play = findViewById(R.id.play);
-        ImageView imgDownload = findViewById(R.id.btnDownload);
-        ImageButton imgback = findViewById(R.id.imgback);
+        imgDownload = findViewById(R.id.btnDownload);
         loopBtn = findViewById(R.id.loopBtn);
         shuffle = findViewById(R.id.shuffle);
+
+//        play.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!isDirty) {
+//                    playAudio();
+//                    play.setImageResource(R.drawable.pause);
+//                    isPlaying =true;
+//                    isDirty = true;
+//                } else {
+//                    if (!isPlaying) {
+//                        resumeAudio();
+//                        play.setImageResource(R.drawable.pause);
+//                    } else {
+//                        mediaPlayer.seekTo(currentPosition);
+//                        mediaPlayer.pause();
+//                        play.setImageResource(R.drawable.play);
+//                    }
+//                }
+//                isPlaying = !isPlaying;
+//            }
+//        });
 
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isDirty) {
-                    playAudio();
-                    play.setImageResource(R.drawable.pause);
-                    isPlaying =true;
-                    isDirty = true;
+                if (mediaPlayer.isPlaying()) {
+                    pauseMusic();
                 } else {
-                    if (!isPlaying) {
-                        resumeAudio();
-                        play.setImageResource(R.drawable.pause);
-                    } else {
-                        mediaPlayer.seekTo(currentPosition);
-                        mediaPlayer.pause();
-                        play.setImageResource(R.drawable.play);
-                    }
+                    playMusic();
                 }
-                isPlaying = !isPlaying;
             }
         });
+
 
         imgDownload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -305,6 +346,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 playPreviousSong();
             }
         });
+        imgback = findViewById(R.id.imgback);
 
         imgback.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -330,7 +372,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                         isLoop = true;
                     }
                 }
-
             }
         });
 
@@ -338,12 +379,15 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             @Override
             public void onClick(View v) {
                 updateUI_Shuffle();
-                toggleShuffle();
+                //toggleShuffle();
             }
         });
-
     }
 
+    public void setShuffle(){
+        if (isShuffling) isShuffling=false;
+        else isShuffling = true;
+    }
     private void updateUI_Loop() {
         // Update UI elements based on the shuffling state
         if (isLoop) {
@@ -362,43 +406,18 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         }
     }
 
-
-    private void toggleShuffle() {
-        isShuffling = !isShuffling;
-
-        if (isShuffling) {
-            // If shuffling is enabled, shuffle the playlist
-            shufflePlaylist();
-        } else {
-            // If shuffling is disabled, reset the playlist to the original order
-            shuffledPlaylist.clear();
-            shuffledPlaylist.addAll(originalPlaylist);
-        }
-
-        // Update UI based on the shuffling state
-        updateUI_Shuffle();
-
-        // Start playing the first song in the shuffled playlist
-       playSong (shuffledPlaylist.get(0));
+    private void playMusic() {
+        mediaPlayer.start();
+        play.setImageResource(R.drawable.pause); // Set the pause icon
+        Toast.makeText(this, "Song is playing", Toast.LENGTH_SHORT).show();
     }
 
-    private void playSong(String songUrl) {
-        // Implement the logic to play the specified song using MediaPlayer
-        // Set the data source, prepare, and start the MediaPlayer
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(songUrl);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void pauseMusic() {
+        mediaPlayer.pause();
+        play.setImageResource(R.drawable.play); // Set the play icon
+        Toast.makeText(this, "Song is paused", Toast.LENGTH_SHORT).show();
     }
 
-    private void shufflePlaylist() {
-        // Shuffle the playlist
-        Collections.shuffle(shuffledPlaylist);
-    }
 
     private void playNextSong() {
 
