@@ -91,14 +91,20 @@
                     android:src="@drawable/phonering"
                     app:tint="@color/black" />
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/btnDownload"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="60dp"
                     android:layout_marginTop="30dp"
+                    android:contentDescription="DownLoad"
                     android:layout_toRightOf="@+id/phonering"
-                    android:src="@drawable/download" />
+                    android:src="@drawable/download"
+                    android:background="@null"
+                    android:scaleType="fitCenter"
+                    android:textColor="@color/black"
+                    tools:ignore="TouchTargetSizeCheck"
+                    />
 
             </RelativeLayout>
 
