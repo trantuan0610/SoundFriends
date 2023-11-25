@@ -361,9 +361,12 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 }
 
                 // Tạo Intent để chuyển đến Activity mới
-                Intent intent = new Intent(Song.this, UploadSongs.class);
+                Intent intent = new Intent(Song.this, MainActivity.class);
+                intent.putExtra("pagePosition", "2");
+
                 // Khởi động Activity mới
                 startActivity(intent);
+
 
                 // Kiểm tra và tiếp tục phát nhạc (nếu cần)
                 Boolean shouldResume = songViewModel.getShouldResumeMusic().getValue();
@@ -395,7 +398,8 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             @Override
             public void onClick(View v) {
                 updateUI_Shuffle();
-                //toggleShuffle();
+                setShuffle();
+//                toggleShuffle();
             }
         });
     }
