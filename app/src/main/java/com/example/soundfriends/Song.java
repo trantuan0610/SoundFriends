@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -77,6 +78,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     ImageButton loopBtn, imgback, shuffle, imgDownload;
     private boolean isLoop, isShuffling = false;
     private boolean isSeeking = false;
+    private SongViewModel songViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -347,15 +349,29 @@ public class Song extends AppCompatActivity implements SensorEventListener {
             }
         });
         imgback = findViewById(R.id.imgback);
-
+        songViewModel = new ViewModelProvider(this).get(SongViewModel.class);
         imgback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (mediaPlayer != null) {
+                    songViewModel.setShouldResumeMusic(mediaPlayer.isPlaying());
+                } else {
+                    songViewModel.setShouldResumeMusic(false);
+                }
+
                 // Tạo Intent để chuyển đến Activity mới
                 Intent intent = new Intent(Song.this, UploadSongs.class);
-
                 // Khởi động Activity mới
                 startActivity(intent);
+
+                // Kiểm tra và tiếp tục phát nhạc (nếu cần)
+                Boolean shouldResume = songViewModel.getShouldResumeMusic().getValue();
+                if (shouldResume != null && shouldResume) {
+                    resumeAudio();
+                    // Tiếp tục phát nhạc ở đây
+                    // Ví dụ: resumeMusic();
+                }
             }
         });
 
