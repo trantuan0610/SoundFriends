@@ -87,6 +87,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         setContentView(R.layout.activity_song);
 
         getData();
+        //HUHU
         //send song id to load comment of that song
         sendDataToFragment(songId);
 
