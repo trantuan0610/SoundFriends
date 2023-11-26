@@ -135,9 +135,9 @@ public class Song extends AppCompatActivity implements SensorEventListener {
 
         // Khởi tạo danh sách chỉ số bài hát
         songIndexes = new ArrayList<>();
-        for (int i = 0; i < songCount; i++) {
-            songIndexes.add(i);
-        }
+
+        initPlayNextSong();
+
 
         // Set up a timer to update the SeekBar while the music is playing
         final Handler handler = new Handler();
@@ -269,28 +269,6 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         loopBtn = findViewById(R.id.loopBtn);
         shuffle = findViewById(R.id.shuffle);
 
-//        play.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (!isDirty) {
-//                    playAudio();
-//                    play.setImageResource(R.drawable.pause);
-//                    isPlaying =true;
-//                    isDirty = true;
-//                } else {
-//                    if (!isPlaying) {
-//                        resumeAudio();
-//                        play.setImageResource(R.drawable.pause);
-//                    } else {
-//                        mediaPlayer.seekTo(currentPosition);
-//                        mediaPlayer.pause();
-//                        play.setImageResource(R.drawable.play);
-//                    }
-//                }
-//                isPlaying = !isPlaying;
-//            }
-//        });
-
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -405,7 +383,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         } else {
             // Bật chế độ Shuffle
             isShuffling = true;
-            Collections.shuffle(songIndexes, new Random());
+//            Collections.shuffle(songIndexes, new Random());
             updateUI_Shuffle();
         }
     }
@@ -414,9 +392,9 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     private void updateUI_Shuffle() {
         // Update UI elements based on the shuffling state
         if (isShuffling) {
-            shuffle.setImageResource(R.drawable.shuffle);
-        } else {
             shuffle.setImageResource(R.drawable.shuffle_color);
+        } else {
+            shuffle.setImageResource(R.drawable.shuffle);
         }
     }
 
@@ -442,7 +420,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     }
 
 
-    private void playNextSong() {
+    private void initPlayNextSong() {
 
         DatabaseReference songsRef = FirebaseDatabase.getInstance().getReference().child("songs");
         songsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -452,40 +430,9 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 songCount = (int) dataSnapshot.getChildrenCount();
                 // Bây giờ bạn đã cập nhật giá trị của songCount dựa trên số lượng bài hát trên Firebase
                 // Bạn có thể sử dụng giá trị này trong code của bạn.
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Xử lý lỗi nếu cần
-            }
-        });
-
-        if (songIndex < songCount - 1) {
-            int nextSongIndex = songIndex + 1; // Tăng chỉ số bài hát để lấy bài hát tiếp theo
-            songIndex = nextSongIndex;
-//            Toast.makeText(getApplicationContext(), "oke " + songIndex, Toast.LENGTH_SHORT).show();
-            changeSong(nextSongIndex);
-        } else {
-            // Đã đến cuối danh sách bài hát
-            // ...
-        }
-
-    }
-
-    private void playPreviousSong() {
-        DatabaseReference songsRef = FirebaseDatabase.getInstance().getReference().child("songs");
-        songsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                songCount = (int) dataSnapshot.getChildrenCount();
-                if (songIndex > 0) {
-                    int previousSongIndex = songIndex - 1;
-                    songIndex = previousSongIndex;
-                    // Giảm chỉ số bài hát để lấy bài hát trước đó
-                    changeSong(previousSongIndex);
-                } else {
-                    // Đã ở đầu danh sách bài hát
-                    // Xử lý theo ý muốn của bạn, ví dụ: quay lại cuối danh sách hoặc hiển thị thông báo
+                for (int i = 0; i < songCount; i++) {
+                    songIndexes.add(i);
                 }
             }
 
@@ -494,7 +441,47 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 // Xử lý lỗi nếu cần
             }
         });
+    }
 
+    private void playNextSong() {
+
+        if (songIndex < songCount - 1) {
+            int nextSongIndex = songIndex + 1; // Tăng chỉ số bài hát để lấy bài hát tiếp theo
+            songIndex = nextSongIndex;
+            Log.d("Shuffle", String.valueOf(isShuffling));
+//            Toast.makeText(getApplicationContext(), "oke " + songIndex, Toast.LENGTH_SHORT).show();
+            if(isShuffling) {
+                Collections.shuffle(songIndexes, new Random());
+                Log.d("WTF", String.valueOf(songIndexes.get(0)));
+                changeSong(songIndexes.get(0));
+            }else {
+
+                changeSong(nextSongIndex);
+            }
+        } else {
+            // Đã đến cuối danh sách bài hát
+            // ...
+        }
+
+    }
+
+    private void playPreviousSong() {
+        if (songIndex > 0) {
+            int previousSongIndex = songIndex - 1;
+            songIndex = previousSongIndex;
+
+            if(isShuffling) {
+                Collections.shuffle(songIndexes, new Random());
+                Log.d("WTF", String.valueOf(songIndexes.get(0)));
+                changeSong(songIndexes.get(0));
+            }else {
+                changeSong(previousSongIndex);
+            }
+            // Giảm chỉ số bài hát để lấy bài hát trước đó
+        } else {
+            // Đã ở đầu danh sách bài hát
+            // Xử lý theo ý muốn của bạn, ví dụ: quay lại cuối danh sách hoặc hiển thị thông báo
+        }
     }
 
         private void changeSong(int next){
