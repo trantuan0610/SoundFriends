@@ -50,6 +50,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -80,6 +81,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     private boolean isLoop, isShuffling = false;
     private boolean isSeeking = false;
     private SongViewModel songViewModel;
+    List<Integer> songIndexes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +126,18 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 isSeeking = false;
             }
         });
+
+        // ...
+        if (songViewModel.getShouldResumeMusic().getValue() != null
+                && songViewModel.getShouldResumeMusic().getValue()) {
+            resumeAudio();
+        }
+
+        // Khởi tạo danh sách chỉ số bài hát
+        songIndexes = new ArrayList<>();
+        for (int i = 0; i < songCount; i++) {
+            songIndexes.add(i);
+        }
 
         // Set up a timer to update the SeekBar while the music is playing
         final Handler handler = new Handler();
@@ -363,16 +377,14 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         shuffle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateUI_Shuffle();
-                setShuffle();
-//                toggleShuffle();
+                toggleShuffle();
             }
         });
     }
 
-    public void setShuffle(){
-        if (isShuffling) isShuffling=false;
-        else isShuffling = true;
+    public void setLoop(){
+        if (isLoop) isLoop=false;
+        else isLoop = true;
     }
     private void updateUI_Loop() {
         // Update UI elements based on the shuffling state
@@ -383,6 +395,22 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         }
     }
 
+    // Chức năng Shuffle
+    private void toggleShuffle() {
+        if (isShuffling) {
+            // Tắt chế độ Shuffle
+            isShuffling = false;
+            Collections.sort(songIndexes);
+            updateUI_Shuffle();
+        } else {
+            // Bật chế độ Shuffle
+            isShuffling = true;
+            Collections.shuffle(songIndexes, new Random());
+            updateUI_Shuffle();
+        }
+    }
+
+
     private void updateUI_Shuffle() {
         // Update UI elements based on the shuffling state
         if (isShuffling) {
@@ -392,6 +420,11 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         }
     }
 
+    public void setShuffle(){
+        if (isShuffling) isShuffling=false;
+        else isShuffling = true;
+    }
+
     private void playMusic() {
         mediaPlayer.start();
         play.setImageResource(R.drawable.pause); // Set the pause icon
@@ -399,9 +432,13 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     }
 
     private void pauseMusic() {
+        super.onPause();
         mediaPlayer.pause();
         play.setImageResource(R.drawable.play); // Set the play icon
         Toast.makeText(this, "Song is paused", Toast.LENGTH_SHORT).show();
+
+        // Lưu trạng thái của MediaPlayer vào ViewModel
+        songViewModel.setMediaPlayerPlaying(mediaPlayer.isPlaying());
     }
 
 
@@ -554,7 +591,11 @@ public class Song extends AppCompatActivity implements SensorEventListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mediaPlayer.release();
+        //mediaPlayer.release();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
     }
 
     private void playAudio() {
@@ -632,6 +673,11 @@ public class Song extends AppCompatActivity implements SensorEventListener {
         super.onResume();
         // Tiếp tục lắng nghe sensor khi ứng dụng tiếp tục
         sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        // Kiểm tra và khôi phục trạng thái của MediaPlayer từ ViewModel
+        if (songViewModel.getShouldResumeMusic().getValue() != null
+                && songViewModel.getShouldResumeMusic().getValue()) {
+            resumeAudio();
+        }
     }
 
     @Override
