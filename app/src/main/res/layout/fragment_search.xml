@@ -3,15 +3,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.SearchFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcvlist_search"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:textSize="20sp"
-        android:layout_marginTop="1dp"
-        />
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/header"
+            android:focusableInTouchMode="true"
+            android:focusable="true">
+
+            <EditText
+                android:id="@+id/search_bar"
+                android:layout_width="0dp"
+                android:layout_height="69dp"
+                android:layout_weight="1"
+                android:background="@color/primary_pink"
+                android:completionThreshold="1"
+                android:hint="Tìm trên SoundFriends ..."
+                android:maxLines="1"
+                android:paddingLeft="26dp" />
+
+            <ImageButton
+                android:id="@+id/btnSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:contentDescription="Voice Search"
+                android:background="@color/primary_pink"
+                android:paddingHorizontal="20dp"
+                app:srcCompat="@drawable/round_search_24" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvlist_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textSize="20sp"
+            android:layout_marginTop="1dp"
+            android:layout_below="@id/header"
+            />
+    </RelativeLayout>
 </FrameLayout>

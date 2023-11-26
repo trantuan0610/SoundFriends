@@ -18,6 +18,7 @@
                 android:orientation="horizontal"
                 android:id="@+id/linearHeaderSettings"
                 android:background="@drawable/header_text_view"
+                android:paddingTop="10dp"
                 android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
