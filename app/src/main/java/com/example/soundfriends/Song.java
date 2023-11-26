@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -321,7 +322,7 @@ public class Song extends AppCompatActivity implements SensorEventListener {
 
                 // Tạo Intent để chuyển đến Activity mới
                 Intent intent = new Intent(Song.this, MainActivity.class);
-                intent.putExtra("pagePosition", "2");
+                intent.putExtra("pagePosition", "0");
 
                 // Khởi động Activity mới
                 startActivity(intent);
@@ -336,6 +337,20 @@ public class Song extends AppCompatActivity implements SensorEventListener {
                 }
             }
         });
+
+        //listen back pressed event
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Tạo Intent để chuyển đến Activity mới
+                Intent intent = new Intent(Song.this, MainActivity.class);
+                intent.putExtra("pagePosition", "0");
+
+                // Khởi động Activity mới
+                startActivity(intent);
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
 
         loopBtn.setOnClickListener(new View.OnClickListener() {
             @Override

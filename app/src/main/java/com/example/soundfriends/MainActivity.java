@@ -12,6 +12,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +27,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
-    AutoCompleteTextView searchBar;
     ViewPager2 viewPager;
     BottomNavigationView bottomNavigationView;
     @Override
@@ -37,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setUserInputEnabled(false);
 //        viewPager.setPageTransformer(new ZoomOutPageTransformer());
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
-        searchBar = findViewById(R.id.search_bar);
 
         //set view pager adapter at bottom navigation
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
                     viewPager.setCurrentItem(1);
                 } else viewPager.setCurrentItem(2);
 
-                ToggleInputFocus.unfocusAndHideKeyboard(MainActivity.this, searchBar);
                 return true;
             }
         });
