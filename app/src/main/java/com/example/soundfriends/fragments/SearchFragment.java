@@ -7,23 +7,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.example.soundfriends.MainActivity;
 import com.example.soundfriends.R;
-import com.example.soundfriends.Song;
 import com.example.soundfriends.adapter.Main_BestSongsAdapter;
 import com.example.soundfriends.adapter.UploadSongs;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.utils.ToggleInputFocus;
 import com.example.soundfriends.utils.WrapContentLinearLayoutManager;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

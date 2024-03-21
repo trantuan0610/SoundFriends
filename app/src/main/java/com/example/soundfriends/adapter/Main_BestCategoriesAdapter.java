@@ -1,12 +1,10 @@
 package com.example.soundfriends.adapter;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.soundfriends.R;
-import com.example.soundfriends.Song;
+import com.example.soundfriends.SongActivity;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.utils.ImageProcessor;
 
@@ -73,7 +71,7 @@ public class Main_BestCategoriesAdapter extends RecyclerView.Adapter<Main_BestCa
             public void onClick(View v) {
 
                 // Create an Intent to open the target Activity
-                Intent intent = new Intent(context, Song.class);
+                Intent intent = new Intent(context, SongActivity.class);
 
                 // Pass any necessary data to the SongActivity (e.g., selected item data)
                 intent.putExtra("songId", model.getId());

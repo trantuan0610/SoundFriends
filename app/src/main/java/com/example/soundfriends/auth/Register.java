@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class Register extends AppCompatActivity {
+    //màn hình đăng kí
     EditText edtEmail, edtPassword, edtPassword2;
     Button btnRegister, btnLogIn;
     ImageView btnRegisterWithGoogle;

@@ -3,11 +3,7 @@ package com.example.soundfriends.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,11 +15,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
+
 import com.example.soundfriends.R;
-import com.example.soundfriends.Song;
+import com.example.soundfriends.SongActivity;
 import com.example.soundfriends.fragments.Model.Songs;
 import com.example.soundfriends.utils.ImageProcessor;
 import com.example.soundfriends.utils.ToggleShowHideUI;
@@ -33,10 +27,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.annotations.Nullable;
-import android.util.Base64;
-import android.widget.Toast;
 
 
 public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myViewHolder> {
@@ -114,7 +104,7 @@ public class UploadSongs extends FirebaseRecyclerAdapter<Songs, UploadSongs.myVi
             public void onClick(View v) {
 
                 // Create an Intent to open the target Activity
-                Intent intent = new Intent(context, Song.class);
+                Intent intent = new Intent(context, SongActivity.class);
 
                 // Pass any necessary data to the SongActivity (e.g., selected item data)
                 intent.putExtra("songId", model.getId());

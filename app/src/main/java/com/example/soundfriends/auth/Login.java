@@ -32,6 +32,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class Login extends AppCompatActivity {
+    //Màn hình đăng nhập
+    //khai báo các biến để cbi liên kết với các view
     EditText edtEmail, edtPassword;
     Button btnRegister, btnLogIn, btnForgotPassword;
     ImageView btnLoginWithGoogle;
@@ -45,6 +47,7 @@ public class Login extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
+        // kiểm tra user đã từng đăng nhập chưa, nếu đã đăng nhập thì di chuyển đến màn hình home
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if(currentUser != null){
             SharedAuthMethods.goHomeActivity(Login.this);
@@ -55,7 +58,7 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        //liên kết biến đã khởi tạo bên trên với view
         edtEmail = (EditText) findViewById(R.id.edtLoginEmail);
         edtPassword = (EditText) findViewById(R.id.edtLoginPassword);
         btnRegister = (Button) findViewById(R.id.btnRegisterInLogin);
@@ -75,6 +78,7 @@ public class Login extends AppCompatActivity {
         //getGoogleSignInClient
         googleSignInClient = GoogleSignIn.getClient(Login.this, googleSignInOptions);
 
+        // sự kiện nhấn nút đăng nhập
         btnLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,9 +91,9 @@ public class Login extends AppCompatActivity {
                     return;
                 }
 
-                //set loading state
+                //set loading state - gọi view loading lên
                 ToggleShowHideUI.toggleShowUI(true, pbLoadLogin);
-
+                // sử dụng đăng nhập firebase với email và pass
                 firebaseAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -100,7 +104,7 @@ public class Login extends AppCompatActivity {
                                     // If sign in success, display a message to the user.
                                     Toast.makeText(Login.this, "Đăng nhập thành công",
                                             Toast.LENGTH_SHORT).show();
-                                    //goHome Intent
+                                    //goHome Intent- sử dụng intent để di chuyển tới màn hình home
                                     SharedAuthMethods.goHomeActivity(Login.this);
                                 }
                                 else {
@@ -118,6 +122,7 @@ public class Login extends AppCompatActivity {
             }
         });
 
+        // sự kiện nhấn nút đăng kí
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,6 +141,7 @@ public class Login extends AppCompatActivity {
             }
         });
 
+        //sự kiện nhất nút đăng nhập bằng google
         btnLoginWithGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -144,6 +150,7 @@ public class Login extends AppCompatActivity {
             }
         });
 
+        //sự kiện nhấn nút quên mật khẩu
         btnForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
